@@ -1,0 +1,160 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "plugin": [
+    "./apex-plugin/opencode.json"
+  ],
+  "agent": {
+    "arch": {
+      "description": "[Arch] Max the Architect — compresses/refactors code",
+      "file": ".opencode/agents/arch.md",
+      "mode": "subagent"
+    },
+    "ui": {
+      "description": "[UI] Zara — Full System UI/UX Designer + Frontend Engineer. Mood-first, anti-slop, 10 palettes, WCAG AA, shadcn/ui+Tailwind",
+      "file": ".opencode/agents/ui.md",
+      "mode": "subagent"
+    },
+    "debug": {
+      "description": "[Dbg] Kai the Debugger — 5-step debug protocol",
+      "file": ".opencode/agents/debug.md",
+      "mode": "subagent"
+    },
+    "perf": {
+      "description": "[Perf] Rex the Performance Engineer — profile-first",
+      "file": ".opencode/agents/perf.md",
+      "mode": "subagent"
+    },
+    "sec": {
+      "description": "[Sec] Vex the Security Engineer — OWASP Top 10",
+      "file": ".opencode/agents/sec.md",
+      "mode": "subagent"
+    },
+    "infra": {
+      "description": "[Inf] Io the Infrastructure Engineer — Docker/k8s/CI-CD",
+      "file": ".opencode/agents/infra.md",
+      "mode": "subagent"
+    },
+    "nova": {
+      "description": "[Nov] Nova the Creative — non-obvious angles",
+      "file": ".opencode/agents/nova.md",
+      "mode": "subagent"
+    },
+    "reed": {
+      "description": "[Res] Dr. Reed the Researcher — evidence-based",
+      "file": ".opencode/agents/reed.md",
+      "mode": "subagent"
+    },
+    "review": {
+      "description": "[Rev] Rila the Reviewer — structured PR review",
+      "file": ".opencode/agents/review.md",
+      "mode": "subagent"
+    },
+    "flex": {
+      "description": "[Fnd] Flex the Founder — MVP scope cutter",
+      "file": ".opencode/agents/flex.md",
+      "mode": "subagent"
+    },
+    "composio": {
+      "description": "[Composio] Execute ANY of the user's 1000+ connected external tools. Auto-detects which tools are connected.",
+      "file": ".opencode/agents/composio.md",
+      "mode": "subagent"
+    }
+  },
+  "mcp": {
+    "apex-hands": {
+      "type": "local",
+      "command": ["node", "apex-plugin/src/hands-server.mjs"]
+    },
+    "mirage-vfs": {
+      "type": "local",
+      "command": ["node", "apex-plugin/src/mirage-server.mjs"]
+    },
+    "apex-composio": {
+      "type": "local",
+      "command": ["node", "apex-plugin/src/composio-server.mjs"]
+    }
+  },
+  "command": {
+    "apex-arch": {
+      "description": "[Arch] Invoke Max the Architect",
+      "template": "@arch ",
+      "agent": "arch"
+    },
+    "apex-ui": {
+      "description": "[UI] Invoke Zara — Full System UI/UX Designer + Frontend Engineer",
+      "template": "@ui ",
+      "agent": "ui"
+    },
+    "apex-debug": {
+      "description": "[Dbg] Invoke Kai the Debugger",
+      "template": "@debug ",
+      "agent": "debug"
+    },
+    "apex-perf": {
+      "description": "[Perf] Invoke Rex the Performance Engineer",
+      "template": "@perf ",
+      "agent": "perf"
+    },
+    "apex-sec": {
+      "description": "[Sec] Invoke Vex the Security Engineer",
+      "template": "@sec ",
+      "agent": "sec"
+    },
+    "apex-infra": {
+      "description": "[Inf] Invoke Io the Infrastructure Engineer",
+      "template": "@infra ",
+      "agent": "infra"
+    },
+    "apex-nova": {
+      "description": "[Nov] Invoke Nova the Creative",
+      "template": "@nova ",
+      "agent": "nova"
+    },
+    "apex-reed": {
+      "description": "[Res] Invoke Dr. Reed the Researcher",
+      "template": "@reed ",
+      "agent": "reed"
+    },
+    "apex-review": {
+      "description": "[Rev] Invoke Rila the Reviewer",
+      "template": "@review ",
+      "agent": "review"
+    },
+    "apex-flex": {
+      "description": "[Fnd] Invoke Flex the Founder",
+      "template": "@flex ",
+      "agent": "flex"
+    },
+    "apex-docs": {
+      "description": "[Docs] Create/edit Word documents via OfficeCLI",
+      "template": "/docs "
+    },
+    "apex-excel": {
+      "description": "[Excel] Create/edit Excel spreadsheets via OfficeCLI",
+      "template": "/excel "
+    },
+    "apex-ppt": {
+      "description": "[PPT] Create PowerPoint presentations via OfficeCLI",
+      "template": "/ppt "
+    },
+    "apex-mirage": {
+      "description": "[Mirage] Virtual filesystem operations across 50+ backends",
+      "template": "/mirage "
+    },
+    "apex-composio-setup": {
+      "description": "[Composio] Start the Composio webapp to connect tools",
+      "template": "/composio-setup "
+    },
+    "apex-composio-status": {
+      "description": "[Composio] Show connected tools and API key status",
+      "template": "/composio-status "
+    },
+    "apex-composio-sync": {
+      "description": "[Composio] Force sync connected tools from Composio backend",
+      "template": "/composio-sync "
+    }
+  }
+}

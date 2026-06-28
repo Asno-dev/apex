@@ -1,0 +1,18 @@
+{
+  "plugin": [
+    "./.opencode/plugins/apex.mjs"
+  ],
+  "commands": {
+    "apex": { "description": "[APEX] Control mode: off | team | select a,b | status", "template": "/apex {{mode}}" },
+    "apex-arch": { "description": "[Arch] Invoke Max the Architect", "template": "@arch " },
+    "apex-ui": { "description": "[UI] Invoke Zara — Full System UI/UX Designer + Frontend Engineer", "template": "@ui " },
+    "apex-debug": { "description": "[Dbg] Invoke Kai the Debugger", "template": "@debug " },
+    "apex-perf": { "description": "[Perf] Invoke Rex the Performance Engineer", "template": "@perf " },
+    "apex-sec": { "description": "[Sec] Invoke Vex the Security Engineer", "template": "@sec " },
+    "apex-infra": { "description": "[Inf] Invoke Io the Infrastructure Engineer", "template": "@infra " },
+    "apex-nova": { "description": "[Nov] Invoke Nova the Creative", "template": "@nova " },
+    "apex-reed": { "description": "[Res] Invoke Dr. Reed the Researcher", "template": "@reed " },
+    "apex-review": { "description": "[Rev] Invoke Rila the Reviewer", "template": "@review " },
+    "apex-flex": { "description": "[Fnd] Invoke Flex the Founder", "template": "@flex " },
+  }
+}

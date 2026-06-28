@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "openagents",
+			"path": "../openagents"
+		},
+		{
+			"name": "desktop",
+			"path": "../desktop"
+		},
+		{
+			"path": "../openbud"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}

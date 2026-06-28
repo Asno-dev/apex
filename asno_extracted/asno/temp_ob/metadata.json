@@ -1,0 +1,6 @@
+{
+  "name": "Cognitive Swarm Studio",
+  "description": "An ultra-advanced workspace powered by a multi-agent system designed for parallel programming, deep research, and PRESENT OS—a cinematic presentation operating system featuring 3D, animations, and slide-by-slide AI generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

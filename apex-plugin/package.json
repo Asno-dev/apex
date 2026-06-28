@@ -1,0 +1,62 @@
+{
+  "name": "@apex-team/apex",
+  "version": "2.0.0",
+  "description": "APEX v2 — 10-agent orchestrator + specialists. Works with Claude Code, Cursor, OpenCode, Cline, Kilo, Copilot, Windsurf, Codex, Gemini CLI, Devin, Hermes, Antigravity, and all CLI coding agents.",
+  "author": "APEX Team",
+  "license": "MIT",
+  "keywords": [
+    "opencode-plugin",
+    "apex",
+    "engineering-team",
+    "orchestrator",
+    "claude-code",
+    "opencode",
+    "cursor",
+    "cline",
+    "kilo",
+    "copilot",
+    "windsurf",
+    "codex",
+    "gemini-cli",
+    "devin",
+    "cli-agent",
+    "ai-coding",
+    "multi-agent"
+  ],
+  "homepage": "https://github.com/apex-team/apex",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apex-team/apex.git"
+  },
+  "main": "./.opencode/plugins/apex.mjs",
+  "exports": {
+    ".": "./.opencode/plugins/apex.mjs",
+    "./plugin": "./.opencode/plugins/apex.mjs"
+  },
+  "files": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "plugin.json",
+    "plugin.yaml",
+    "opencode.json",
+    "gemini-extension.json",
+    ".cursorrules",
+    ".clinerules",
+    ".github/",
+    ".windsurf/",
+    ".cursor/",
+    ".claude/",
+    ".opencode/",
+    "docs/",
+    "install.sh",
+    "install.ps1"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@composio/core": "^0.10.0",
+    "@struktoai/mirage-node": "^0.0.2",
+    "docx": "^9.7.1"
+  }
+}

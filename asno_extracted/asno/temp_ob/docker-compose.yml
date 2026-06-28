@@ -1,0 +1,20 @@
+services:
+  desktop:
+    build:
+      context: ./packages/desktop
+      dockerfile: Dockerfile
+    ports:
+      - "6080:6080" # noVNC Desktop
+      - "5900:5900" # VNC Desktop
+      - "5070:5000" # API & Health
+    shm_size: '2gb'
+    environment:
+      - VNC_RESOLUTION=1280x800
+    privileged: true
+    dns: [8.8.8.8, 8.8.4.4]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

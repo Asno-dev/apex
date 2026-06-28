@@ -1,0 +1,67 @@
+{
+  "hooks": {
+    "preToolUse": [
+      {
+        "matcher": "Bash",
+        "blockIf": [
+          "rm -rf /",
+          "rm -rf /*",
+          "DROP TABLE .* WHERE",
+          "DROP TABLE",
+          "DELETE FROM .* WHERE",
+          "git push --force",
+          "git push origin main --force",
+          "git push origin master --force",
+          "> /dev/sda",
+          ":(){ :|:& };:"
+        ],
+        "message": "Safety: destructive command blocked. If intentional, run manually."
+      }
+    ],
+    "postToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "include": ".*\\.(ts|tsx|js|jsx)$",
+        "run": "if (Test-Path package.json) { pwsh -Command \"if (Select-String -Path package.json -Pattern '\\\"lint\\\"' -Quiet) { npm run lint --if-present } }",
+        "silent": true
+      },
+      {
+        "matcher": "Write|Edit",
+        "include": ".*\\.(ts|tsx|js|jsx)$",
+        "run": "if (Test-Path package.json) { pwsh -Command \"if (Select-String -Path package.json -Pattern '\\\"typecheck\\\"' -Quiet) { npm run typecheck --if-present } }",
+        "silent": true
+      }
+    ],
+    "sessionStart": [
+      {
+        "run": "if (!(Test-Path AGENTS.md)) { Write-Warning 'AGENTS.md not found — APEX not installed' }"
+      }
+    ],
+    "preCompact": [
+      {
+        "run": "$date = Get-Date -Format 'yyyy-MM-dd'; $dir = '.claude/sessions'; $null = New-Item -ItemType Directory -Path $dir -Force; 'APEX session: ' + $date | Out-File -Append \"$dir/$date.md\""
+      }
+    ]
+  },
+  "observers": {
+    "logToolUse": {
+      "enabled": true,
+      "path": ".claude/apex-audit.log",
+      "format": "jsonl"
+    },
+    "tokenGuard": {
+      "enabled": true,
+      "warnAtTurns": 15,
+      "compressAtTokens": 40000
+    }
+  },
+  "permissions": {
+    "tools": [
+      "Read", "Write", "Edit", "Glob", "Grep",
+      "Bash", "WebFetch", "WebSearch",
+      "Task", "Skill", "Question",
+      "Todowrite"
+    ],
+    "bashScope": "project"
+  }
+}

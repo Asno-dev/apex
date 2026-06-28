@@ -1,0 +1,6 @@
+{
+  "name": "vibe coding mutli sub",
+  "description": "An AI-powered website builder that generates and previews web applications from natural language prompts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

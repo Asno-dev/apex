@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "vibe",
+			"path": "../../../vibe"
+		},
+		{
+			"name": "agent desktop",
+			"path": "../../../agent desktop"
+		},
+		{
+			"name": "desktop",
+			"path": "../.."
+		}
+	],
+	"settings": {}
+}

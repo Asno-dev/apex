@@ -1,0 +1,34 @@
+name: apex
+version: 2.0.0
+description: APEX v2 — 10-agent senior engineering team. @arch architect, @ui UI, @debug debug, @perf perf, @sec security, @infra infra, @nova creative, @reed research, @review PR review, @flex MVP scope.
+author: APEX Team
+provides_hooks:
+  - pre_tool_use
+  - post_tool_use
+provides_commands:
+  - apex
+  - apex-arch
+  - apex-ui
+  - apex-debug
+  - apex-perf
+  - apex-sec
+  - apex-infra
+  - apex-nova
+  - apex-reed
+  - apex-review
+  - apex-flex
+provides_skills:
+  - refactor
+  - ui-generate
+  - debug-protocol
+  - perf-audit
+  - sec-review
+  - pr-review
+  - system-design
+  - research
+  - mvp-cut
+  - full-stack-scaffold
+  - test-harness
+  - bug-patch
+  - requirements-to-spec
+  - deploy-pipeline
