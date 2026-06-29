@@ -1,0 +1,28 @@
+# Sensitive files
+.composio-config.json
+.env
+.env.local
+.env.*.local
+
+# Development files
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# Orphaned/unused files
+npm-package.json
+create-benchmark-doc.mjs
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+._*

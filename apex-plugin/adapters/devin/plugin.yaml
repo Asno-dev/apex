@@ -1,0 +1,19 @@
+name: apex
+version: 2.0.0
+description: APEX v2 — 10-agent senior engineering team. Routes requests to specialists.
+author: asno-dev
+provides_skills:
+  - apex
+  - apex-arch
+  - apex-ui
+  - apex-debug
+  - apex-perf
+  - apex-sec
+  - apex-infra
+  - apex-nova
+  - apex-reed
+  - apex-review
+  - apex-flex
+provides_commands:
+  - apex
+  - apex-help

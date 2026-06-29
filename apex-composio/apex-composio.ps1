@@ -20,16 +20,72 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ApexDir = Split-Path -Parent $ScriptDir
 $ConfigFile = Join-Path $ApexDir ".composio-config.json"
-$node = "C:\Program Files\nodejs\node.exe"
-$npm = "C:\Program Files\nodejs\npm.cmd"
+
+function Find-Node {
+  $candidates = @(
+    (Get-Command node -ErrorAction SilentlyContinue).Source,
+    "C:\Program Files\nodejs\node.exe",
+    "C:\Program Files (x86)\nodejs\node.exe",
+    "$env:LOCALAPPDATA\Programs\node\node.exe"
+  ) | Where-Object { $_ -and (Test-Path $_) }
+  return $candidates | Select-Object -First 1
+}
+
+function Find-Npm {
+  $candidates = @(
+    (Get-Command npm -ErrorAction SilentlyContinue).Source,
+    "C:\Program Files\nodejs\npm.cmd",
+    "C:\Program Files (x86)\nodejs\npm.cmd",
+    "$env:LOCALAPPDATA\Programs\node\npm.cmd"
+  ) | Where-Object { $_ -and (Test-Path $_) }
+  return $candidates | Select-Object -First 1
+}
+
+$script:nodePath = Find-Node
+$script:npmPath = Find-Npm
+
+if (-not $script:nodePath) {
+  Write-Host "ERROR: node.exe not found. Install Node.js from https://nodejs.org" -ForegroundColor Red
+  exit 1
+}
 
 function EnsureNodeModules {
-  if (-not (Test-Path (Join-Path $ScriptDir "node_modules"))) {
-    Write-Host "Installing dependencies..." -ForegroundColor Yellow
-    Push-Location $ScriptDir
-    & $npm install --ignore-scripts 2>&1 | Out-Null
-    & $node (Join-Path $ScriptDir "node_modules\esbuild\install.js") 2>&1 | Out-Null
+  $nmDir = Join-Path $ScriptDir "node_modules"
+  $tsxCli = Join-Path $nmDir "tsx\dist\cli.mjs"
+  $esbuildExe = Join-Path $nmDir "esbuild\bin\esbuild"
+
+  # Already good
+  if ((Test-Path $tsxCli) -and (Test-Path $esbuildExe)) { return }
+
+  Write-Host "Installing dependencies..." -ForegroundColor Yellow
+  Push-Location $ScriptDir
+  try {
+    if ($script:npmPath) {
+      & $script:npmPath install --ignore-scripts 2>&1 | Out-Null
+    } else {
+      & $script:nodePath (Join-Path $ScriptDir "node_modules\npm\bin\npm-cli.js") install --ignore-scripts 2>&1 | Out-Null
+    }
+    # Run esbuild postinstall
+    $esbuildInstall = Join-Path $nmDir "esbuild\install.js"
+    if (Test-Path $esbuildInstall) {
+      & $script:nodePath $esbuildInstall 2>&1 | Out-Null
+    }
+  } finally {
     Pop-Location
+  }
+}
+
+function Test-ServerRunning {
+  $prevEAP = $ErrorActionPreference
+  try {
+    $ErrorActionPreference = "SilentlyContinue"
+    # Use curl (ships with Windows 10+) — more reliable than Invoke-WebRequest
+    $result = & curl -s -o NUL -w "%{http_code}" --connect-timeout 2 http://localhost:3001/api/apex/connected-tools 2>$null
+    return ($result -eq "200")
+  } catch {
+    return $false
+  } finally {
+    $ErrorActionPreference = $prevEAP
   }
 }
 
@@ -53,6 +109,19 @@ function GetLiveStatus {
 
 function Cmd-Setup {
   EnsureNodeModules
+
+  # Check if server already running
+  if (Test-ServerRunning) {
+    Write-Host ""
+    Write-Host "  APEX Composio server already running at http://localhost:3001" -ForegroundColor Green
+    $cfg = ReadConfig
+    if ($cfg -and $cfg.connectedTools -and $cfg.connectedTools.Count -gt 0) {
+      Write-Host "  Connected: $($cfg.connectedTools -join ', ')" -ForegroundColor Cyan
+      Write-Host "  Use @$($cfg.connectedTools[0]) in chat to invoke" -ForegroundColor Cyan
+    }
+    Write-Host ""
+    return
+  }
 
   # Show connected tools before starting
   $cfg = ReadConfig
@@ -84,8 +153,9 @@ function Cmd-Setup {
     Write-Host ""
   }
 
-  $env:PATH = "C:\Program Files\nodejs;$env:PATH"
-  & $node (Join-Path $ScriptDir "node_modules\tsx\dist\cli.mjs") (Join-Path $ScriptDir "server.ts")
+  $tsxPath = Join-Path $ScriptDir "node_modules\tsx\dist\cli.mjs"
+  $serverPath = Join-Path $ScriptDir "server.ts"
+  & $script:nodePath $tsxPath $serverPath
 }
 
 function Cmd-Status {
@@ -229,8 +299,20 @@ function Cmd-Exec {
   }
 }
 
+function Cmd-Start {
+  EnsureNodeModules
+  if (Test-ServerRunning) {
+    Write-Host "Server already running at http://localhost:3001" -ForegroundColor Green
+    return
+  }
+  $tsxPath = Join-Path $ScriptDir "node_modules\tsx\dist\cli.mjs"
+  $serverPath = Join-Path $ScriptDir "server.ts"
+  & $script:nodePath $tsxPath $serverPath
+}
+
 switch ($Command.ToLower()) {
   "setup" { Cmd-Setup }
+  "start" { Cmd-Start }
   "status" { Cmd-Status }
   "connected" { Cmd-Connected }
   "tools" { Cmd-Tools }
@@ -240,7 +322,8 @@ switch ($Command.ToLower()) {
     Write-Host "Usage: .\apex-composio.ps1 <command> [args]"
     Write-Host ""
     Write-Host "Commands:"
-    Write-Host "  setup         Start the Composio webapp (http://localhost:3001)"
+    Write-Host "  setup         Start webapp + ensure deps (http://localhost:3001)"
+    Write-Host "  start         Start webapp only (no dep install)"
     Write-Host "  status        Show API key + connected tools summary"
     Write-Host "  connected     List only connected tools (machine-readable)"
     Write-Host "  tools         List all available composio tools"

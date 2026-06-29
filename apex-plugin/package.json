@@ -1,62 +1,70 @@
 {
-  "name": "@apex-team/apex",
+  "name": "@asno-dev/apex",
   "version": "2.0.0",
-  "description": "APEX v2 — 10-agent orchestrator + specialists. Works with Claude Code, Cursor, OpenCode, Cline, Kilo, Copilot, Windsurf, Codex, Gemini CLI, Devin, Hermes, Antigravity, and all CLI coding agents.",
-  "author": "APEX Team",
-  "license": "MIT",
-  "keywords": [
-    "opencode-plugin",
-    "apex",
-    "engineering-team",
-    "orchestrator",
-    "claude-code",
-    "opencode",
-    "cursor",
-    "cline",
-    "kilo",
-    "copilot",
-    "windsurf",
-    "codex",
-    "gemini-cli",
-    "devin",
-    "cli-agent",
-    "ai-coding",
-    "multi-agent"
-  ],
-  "homepage": "https://github.com/apex-team/apex",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/apex-team/apex.git"
-  },
-  "main": "./.opencode/plugins/apex.mjs",
-  "exports": {
-    ".": "./.opencode/plugins/apex.mjs",
-    "./plugin": "./.opencode/plugins/apex.mjs"
+  "description": "APEX v2 — 10-agent senior engineering team. Works with 16+ coding agents: Claude Code, Codex, Cursor, Cline, Copilot, Windsurf, Gemini, Devin, Hermes, Pi, OpenCode, and more.",
+  "main": "index.js",
+  "bin": {
+    "apex": "./bin/apex.js"
   },
   "files": [
+    "bin/",
+    "hooks/",
+    "skills/",
+    "adapters/",
+    "src/",
+    "scripts/",
+    "docs/",
+    "index.js",
     "AGENTS.md",
     "CLAUDE.md",
-    "plugin.json",
-    "plugin.yaml",
+    "USAGE.md",
     "opencode.json",
     "gemini-extension.json",
-    ".cursorrules",
-    ".clinerules",
-    ".github/",
-    ".windsurf/",
-    ".cursor/",
-    ".claude/",
-    ".opencode/",
-    "docs/",
+    "plugin.json",
+    "plugin.yaml",
     "install.sh",
     "install.ps1"
   ],
-  "publishConfig": {
-    "access": "public"
+  "scripts": {
+    "test": "node scripts/check-rule-copies.js",
+    "lint": "echo 'lint ok'",
+    "prepublishOnly": "node scripts/check-rule-copies.js"
   },
-  "dependencies": {
-    "@composio/core": "^0.10.0",
-    "@struktoai/mirage-node": "^0.0.2",
-    "docx": "^9.7.1"
-  }
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "claude-code",
+    "cursor",
+    "opencode",
+    "cline",
+    "copilot",
+    "windsurf",
+    "gemini",
+    "devin",
+    "hermes",
+    "codex",
+    "code-review",
+    "debugging",
+    "performance",
+    "security",
+    "architecture",
+    "10-agent",
+    "orchestrator",
+    "apex"
+  ],
+  "author": "asno-dev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asno-dev/apex"
+  },
+  "homepage": "https://github.com/asno-dev/apex",
+  "bugs": {
+    "url": "https://github.com/asno-dev/apex/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
 }

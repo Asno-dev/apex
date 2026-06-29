@@ -4,147 +4,106 @@ $ApexDir = Split-Path -Parent $PSCommandPath
 $ProjectDir = Get-Location
 $Summary = @()
 
-function Write-Green($m) { Write-Host "  $m" -ForegroundColor Green }
-function Write-Dim($m) { Write-Host "  $m" -ForegroundColor DarkGray }
+function Write-Green($m) { Write-Host "  ✓ $m" -ForegroundColor Green }
+function Write-Dim($m) { Write-Host "  ~ $m" -ForegroundColor DarkGray }
+function Write-Bold($m) { Write-Host $m -ForegroundColor White }
 function Has-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
 
-Write-Host "`n  APEX v2 — Senior Engineering Team`n  ================================="
+Write-Bold "`n  APEX v2 — Senior Engineering Team"
+Write-Bold "  =================================`n"
 
 # --- Universal AGENTS.md ---
 Copy-Item "$ApexDir\AGENTS.md" "$ProjectDir\AGENTS.md" -Force -ErrorAction SilentlyContinue
-Write-Green "✓ AGENTS.md — universal config for all CLI agents"
+Write-Green "AGENTS.md (universal)"
 $Summary += "✓ AGENTS.md"
 
 # --- Claude Code ---
-$null = New-Item -ItemType Directory -Path "$ProjectDir\.claude\agents", "$ProjectDir\.claude\skills", "$ProjectDir\.claude\sessions" -Force
-Copy-Item "$ApexDir\CLAUDE.md" "$ProjectDir\CLAUDE.md" -Force -ErrorAction SilentlyContinue
-Copy-Item "$ApexDir\.claude\agents\*.md" "$ProjectDir\.claude\agents\" -Force -ErrorAction SilentlyContinue
-Get-ChildItem "$ApexDir\.claude\skills\*" -Directory -ErrorAction SilentlyContinue | ForEach-Object { Copy-Item $_.FullName "$ProjectDir\.claude\skills\" -Recurse -Force }
-Copy-Item "$ApexDir\.claude\settings.json" "$ProjectDir\.claude\settings.json" -Force -ErrorAction SilentlyContinue
-if (Test-Path "$ApexDir\docs") { Copy-Item "$ApexDir\docs" "$ProjectDir\" -Recurse -Force }
 if (Has-Command claude) {
-  Write-Green "✓ Claude Code: CLAUDE.md + .claude/ + docs/ installed"
+  $null = New-Item -ItemType Directory -Path "$ProjectDir\.claude\agents", "$ProjectDir\.claude\skills" -Force
+  Copy-Item "$ApexDir\CLAUDE.md" "$ProjectDir\CLAUDE.md" -Force -ErrorAction SilentlyContinue
+  Copy-Item "$ApexDir\.claude\agents\*.md" "$ProjectDir\.claude\agents\" -Force -ErrorAction SilentlyContinue
+  if (Test-Path "$ApexDir\skills") { Copy-Item "$ApexDir\skills\*" "$ProjectDir\.claude\skills\" -Recurse -Force }
+  Write-Green "Claude Code"
   $Summary += "✓ Claude Code"
-  $null = claude plugin add "$ApexDir" 2>$null
 } else {
-  Write-Dim "~ Claude Code: files written (tool not detected)"
-  $Summary += "~ Claude Code (fallback)"
+  Write-Dim "Claude Code: not detected"
 }
 
 # --- Cursor ---
 $null = New-Item -ItemType Directory -Path "$ProjectDir\.cursor\rules" -Force
 Copy-Item "$ApexDir\.cursorrules" "$ProjectDir\.cursorrules" -Force -ErrorAction SilentlyContinue
 Copy-Item "$ApexDir\.cursor\rules\*.mdc" "$ProjectDir\.cursor\rules\" -Force -ErrorAction SilentlyContinue
-if (Has-Command cursor) {
-  Write-Green "✓ Cursor: rules installed"
-  $Summary += "✓ Cursor"
-} else {
-  Write-Dim "~ Cursor: .cursorrules + .cursor/rules/ written (tool not detected)"
-  $Summary += "~ Cursor (fallback)"
-}
+Write-Green "Cursor"
+$Summary += "✓ Cursor"
 
 # --- OpenCode ---
-$null = New-Item -ItemType Directory -Path "$ProjectDir\.opencode\plugins", "$ProjectDir\.opencode\command" -Force
-Copy-Item "$ApexDir\opencode.json" "$ProjectDir\opencode.json" -Force -ErrorAction SilentlyContinue
-Copy-Item "$ApexDir\.opencode\plugins\apex.mjs" "$ProjectDir\.opencode\plugins\apex.mjs" -Force -ErrorAction SilentlyContinue
-Copy-Item "$ApexDir\.opencode\command\*.md" "$ProjectDir\.opencode\command\" -Force -ErrorAction SilentlyContinue
 if (Has-Command opencode) {
-  Write-Green "✓ OpenCode: plugin installed"
+  $null = New-Item -ItemType Directory -Path "$ProjectDir\.opencode\plugins", "$ProjectDir\.opencode\command" -Force
+  Copy-Item "$ApexDir\opencode.json" "$ProjectDir\opencode.json" -Force -ErrorAction SilentlyContinue
+  Copy-Item "$ApexDir\adapters\opencode\apex.mjs" "$ProjectDir\.opencode\plugins\apex.mjs" -Force -ErrorAction SilentlyContinue
+  Copy-Item "$ApexDir\.opencode\command\*.md" "$ProjectDir\.opencode\command\" -Force -ErrorAction SilentlyContinue
+  Write-Green "OpenCode"
   $Summary += "✓ OpenCode"
 } else {
-  Write-Dim "~ OpenCode: plugin files written (tool not detected)"
-  $Summary += "~ OpenCode (fallback)"
+  Write-Dim "OpenCode: not detected"
 }
 
 # --- Cline / Kilo Code ---
 Copy-Item "$ApexDir\.clinerules" "$ProjectDir\.clinerules" -Force -ErrorAction SilentlyContinue
-Write-Green "✓ Cline/Kilo Code: .clinerules written"
+Write-Green "Cline/Kilo"
 $Summary += "✓ Cline/Kilo"
 
 # --- GitHub Copilot ---
 $null = New-Item -ItemType Directory -Path "$ProjectDir\.github" -Force
 Copy-Item "$ApexDir\.github\copilot-instructions.md" "$ProjectDir\.github\copilot-instructions.md" -Force -ErrorAction SilentlyContinue
-Write-Green "✓ GitHub Copilot: instructions written"
+Write-Green "GitHub Copilot"
 $Summary += "✓ GitHub Copilot"
 
 # --- Windsurf ---
 $null = New-Item -ItemType Directory -Path "$ProjectDir\.windsurf" -Force
 Copy-Item "$ApexDir\.windsurf\rules.md" "$ProjectDir\.windsurf\rules.md" -Force -ErrorAction SilentlyContinue
-Write-Green "✓ Windsurf: rules written"
+Write-Green "Windsurf"
 $Summary += "✓ Windsurf"
 
-# --- OfficeCLI ---
-try {
-  Write-Dim "~ Installing OfficeCLI..."
-  $ocResult = powershell -Command "irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex" 2>&1
-  Write-Green "✓ OfficeCLI installed"
-  $Summary += "✓ OfficeCLI"
-} catch {
-  Write-Dim "~ OfficeCLI: download failed (install manually from https://officecli.ai)"
-  $Summary += "~ OfficeCLI (manual)"
-}
-
-# --- Mirage (TypeScript CLI) ---
-if (Has-Command npm) {
-  try {
-    npm install -g @struktoai/mirage-cli --silent 2>$null
-    Write-Green "✓ Mirage CLI (TypeScript)"
-    $Summary += "✓ Mirage TS"
-  } catch {
-    Write-Dim "~ Mirage TS: npm install failed"
-    $Summary += "~ Mirage TS (manual)"
-  }
+# --- Gemini CLI ---
+if (Has-Command gemini) {
+  Copy-Item "$ApexDir\gemini-extension.json" "$ProjectDir\gemini-extension.json" -Force -ErrorAction SilentlyContinue
+  Write-Green "Gemini CLI"
+  $Summary += "✓ Gemini CLI"
 } else {
-  Write-Dim "~ Mirage TS: npm not found (install Node.js 20+)"
-  $Summary += "~ Mirage TS (npm missing)"
+  Write-Dim "Gemini CLI: not detected"
 }
 
-# --- Mirage (Python SDK) ---
-if (Has-Command pip) {
-  try {
-    pip install mirage-ai -q 2>$null
-    Write-Green "✓ Mirage Python SDK"
-    $Summary += "✓ Mirage Py"
-  } catch {
-    Write-Dim "~ Mirage Py: pip install failed"
-    $Summary += "~ Mirage Py (manual)"
-  }
-} elseif (Has-Command uv) {
-  try {
-    uv add mirage-ai -q 2>$null
-    Write-Green "✓ Mirage Python SDK (uv)"
-    $Summary += "✓ Mirage Py"
-  } catch {
-    Write-Dim "~ Mirage Py: uv add failed"
-    $Summary += "~ Mirage Py (manual)"
-  }
-} else {
-  Write-Dim "~ Mirage Py: Python/pip not found (Python 3.11+ required)"
-  $Summary += "~ Mirage Py (Python missing)"
+# --- Skills ---
+if (Test-Path "$ApexDir\skills") {
+  $null = New-Item -ItemType Directory -Path "$ProjectDir\.claude\skills" -Force
+  Copy-Item "$ApexDir\skills\*" "$ProjectDir\.claude\skills\" -Recurse -Force
+  Write-Green "Skills (24 skills)"
+  $Summary += "✓ Skills"
 }
 
-# --- Global ~/.apex/ store ---
-$null = New-Item -ItemType Directory -Path "$HOME\.apex" -Force
-Copy-Item "$ApexDir\AGENTS.md" "$HOME\.apex\AGENTS.md" -Force -ErrorAction SilentlyContinue
-Copy-Item "$ApexDir\CLAUDE.md" "$HOME\.apex\CLAUDE.md" -Force -ErrorAction SilentlyContinue
-Copy-Item "$ApexDir\.cursorrules" "$HOME\.apex\.cursorrules" -Force -ErrorAction SilentlyContinue
-Write-Green "✓ Global configs stored in ~/.apex/"
-$Summary += "✓ Global ~/.apex/"
-
-Write-Host "`n  === Summary ==="
+# --- Summary ---
+Write-Bold "`n  === Summary ==="
 foreach ($item in $Summary) { Write-Host "  $item" }
 
+Write-Bold "`n  === Quick Start ==="
 Write-Host @"
+  @arch refactor this         → Max compresses code
+  @ui build a login form      → Zara paints WCAG AA form
+  @debug fix this error       → Kai 5-step debug
+  @perf this is slow          → Rex profiles & optimizes
+  @sec review auth code       → Vex OWASP scans
+  @infra dockerize this       → Io outputs production config
+  @nova any ideas             → Nova proposes novel angles
+  @reed best caching          → Dr. Reed compares options
+  @review check this code     → Rila blocks/suggests/praises
+  @flex what's the MVP?       → Flex scores & cuts scope
+"@
 
-  === OfficeCLI (Word, Excel, PowerPoint) ===
-  /docs create a report               → OfficeCLI Word document
-  /excel build a budget               → OfficeCLI Excel spreadsheet
-  /ppt make a presentation            → OfficeCLI PowerPoint deck
-  @docs / @excel / @ppt               → Alias shortcuts
-
-  === Mirage (Unified Virtual File System) ===
-  /mirage cp /s3/file.csv /data/      → Copy across backends
-  /mirage grep error /slack/channels/  → Search across services
-
-  Modes: /apex team | /apex select a,b | /apex off | /apex status
+Write-Bold "  === Marketplace Installs ==="
+Write-Host @"
+  Claude Code:  /plugin marketplace add asno-dev/apex
+  Codex:        codex plugin marketplace add asno-dev/apex
+  Gemini CLI:   gemini extensions install https://github.com/asno-dev/apex
+  OpenCode:     add "@asno-dev/apex" to opencode.json plugins
 "@

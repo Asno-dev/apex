@@ -40,12 +40,13 @@ function load() {
     }
   }
 
-  if (config.authConfigs) {
-    for (const [t, c] of Object.entries(config.authConfigs)) {
-      if (c && isPlaceholder(c)) {
-        delete config.authConfigs[t]
-        changed = true
-      }
+  if (!config.authConfigs) config.authConfigs = {}
+
+  let changed = false
+  for (const [t, c] of Object.entries(config.authConfigs)) {
+    if (c && isPlaceholder(c)) {
+      delete config.authConfigs[t]
+      changed = true
     }
   }
   if (changed) {
@@ -72,11 +73,12 @@ export function setUserId(id) {
 
 export function getAuthConfig(tool) {
   const config = load()
-  return config.authConfigs[tool] || ''
+  return (config.authConfigs || {})[tool] || ''
 }
 
 export function setAuthConfig(tool, configId) {
   const config = load()
+  if (!config.authConfigs) config.authConfigs = {}
   config.authConfigs[tool] = configId
   save(config)
 }

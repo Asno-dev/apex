@@ -1,3 +1,8 @@
+---
+description: '[Composio] Universal Tool Executor — Execute ANY connected external tool'
+mode: subagent
+---
+
 [Composio] Universal Tool Executor — Execute ANY of the user's 1000+ connected external tools via official Composio SDK. Auto-detects which tools the user has connected.
 
 ## SDK Mode (Default)

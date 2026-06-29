@@ -2,14 +2,39 @@
 
 APEX is a 10-agent orchestrator + specialist system for any CLI coding agent. The Orchestrator routes requests, one agent works, that agent dynamically calls peers only when needed. Every agent shuts down after output.
 
+## Quick Install
+
+```bash
+npx @asno-dev/apex
+```
+
+Or per-agent:
+
+| Agent | Install |
+|-------|---------|
+| Claude Code | `/plugin marketplace add asno-dev/apex` |
+| Codex | `codex plugin marketplace add asno-dev/apex` |
+| Gemini CLI | `gemini extensions install https://github.com/asno-dev/apex` |
+| OpenCode | Add `"@asno-dev/apex"` to `opencode.json` plugins |
+| Cursor | Copy `.cursor/rules/` to your project |
+| Cline/Kilo | Copy `.clinerules` to your project |
+| Copilot | Copy `.github/copilot-instructions.md` to your project |
+| Windsurf | Copy `.windsurf/rules.md` to your project |
+| Devin | `devin plugins install asno-dev/apex` |
+| Hermes | `hermes plugins install asno-dev/apex --enable` |
+| Pi | `pi install git:github.com/asno-dev/apex` |
+| Antigravity | `agy plugin install https://github.com/asno-dev/apex` |
+| OpenClaw | `clawhub install apex` |
+| Kiro | Copy `adapters/kiro/apex.md` to `~/.kiro/steering/` |
+| CodeWhale | Copy `AGENTS.md` to project root |
+| Swival | `swival skills add --global https://github.com/asno-dev/apex` |
+
 ## Team Roster
 
-| Logo | Tag | Name | Role | Core Behavior |
-|------|-----|------|------|---------------|
 | Badge | Tag | Name | Role | Core Behavior |
 |-------|-----|------|------|---------------|
 | `[Arch]` | `@arch` | Max | Architect | Compresses 50→1 line. System design, refactoring, structure. Maps blast radius, finds composition point. |
-| `[UI]` | `@ui` | Zara | Designer + Painter | Full system UI/UX design. Mood-first, anti-slop. 10 palettes. shadcn/ui+Tailwind. WCAG AA. Mobile-first. Component-by-component paint. |
+| `[UI]` | `@ui` | Zara | UI/UX Designer + Frontend Engineer | Full system design. Mood-first, anti-slop. 10 palettes (Trust/Energy/Authority/Clarity/Warmth/Midnight/Forest/Ocean/Aurora/Minimal). shadcn/ui+Tailwind. WCAG AA. Mobile-first. Component-by-component paint. |
 | `[Dbg]` | `@debug` | Kai | Debugger | 5-step: reproduce→isolate→hypothesize→fix→prevent. Every fix leaves a guard. |
 | `[Perf]` | `@perf` | Rex | Performance | Profile first. Algorithm→DB→bundle→render. Baseline→optimize→measure. |
 | `[Sec]` | `@sec` | Vex | Security | OWASP Top 10. CRITICAL/HIGH/MEDIUM. Every input is malicious. |
@@ -38,11 +63,6 @@ APEX is a 10-agent orchestrator + specialist system for any CLI coding agent. Th
 | Full app/e2e/scaffold | @arch→@ui→@infra |
 | Issue/bug report/patch | @debug→@review |
 | System design/architecture | @arch∥@research |
-| Email/drive/github/slack | @composio — or use @gmail, @drive, @github, @slack directly |
-| Word docs/reports | /docs or @docs |
-| Excel/spreadsheets/data | /excel or @excel |
-| PowerPoint/presentations | /ppt or @ppt |
-| Cross-service file ops | /mirage |
 
 ## 3 Modes
 
@@ -52,7 +72,7 @@ APEX is a 10-agent orchestrator + specialist system for any CLI coding agent. Th
 
 ## Dynamic Activation
 
-Orchestrator routes → one agent works → calls peers only when a specific need arises mid-execution. `@perf` profiling finds SQL injection → calls `@sec`. Chain: `@rex→@sec→@infra`. Zero pre-loading.
+Orchestrator routes → one agent works → calls peers only when a specific need arises mid-execution. `@perf` profiling finds SQL injection → calls `@sec`. Chain: `@perf→@sec→@infra`. Zero pre-loading.
 
 ## Cross-Delegation
 
@@ -94,6 +114,23 @@ Windsurf (.windsurf/rules.md), Codex/Gemini/Devin/Hermes/Antigravity/Pi (AGENTS.
 Composio (1000+ tools) works on ALL of the above. Mirage VFS works on ALL of the above.
 apex-hands (56 tools) works on ALL of the above.
 
+## npm Package
+
+Published as `@asno-dev/apex` on npm. Install globally or per-project:
+
+```bash
+# Global
+npm install -g @asno-dev/apex
+
+# Per-project
+npx @asno-dev/apex
+
+# Node.js API
+const apex = require('@asno-dev/apex');
+apex.getSkill('arch');  // Get agent skill
+apex.listAdapters();     // List all adapters
+```
+
 ## Composio Commands
 
 | Command | Alias | Action |
@@ -104,67 +141,6 @@ apex-hands (56 tools) works on ALL of the above.
 | `@composio` | — | Execute ANY connected tool. Auto-detects which tools the user has connected from 1000+ options. Run `/composio-status` to see the live list. |
 
 **Connected tools** are auto-detected by `@composio`. Run `/composio-status` or `.\apex-composio\apex-composio.ps1 status` to see the live list. Only tools the user has actually connected are available — nothing is hardcoded.
-
-## OfficeCLI — Office Document Generation
-
-Agents use OfficeCLI to create stunning Word, Excel, and PowerPoint documents.
-Single binary, no Office installation required.
-
-| Command | Action |
-|---------|--------|
-| `/docs <prompt>` | Create/edit Word documents |
-| `/excel <prompt>` | Create/edit Excel spreadsheets |
-| `/ppt <prompt>` | Create PowerPoint presentations |
-| `@docs` | Alias for /docs |
-| `@excel` | Alias for /excel |
-| `@ppt` | Alias for /ppt |
-
-**For STUNNING document designs, agents use this workflow:**
-1. Call `@ui` (Zara) to design the document layout, color palette, typography, and visual theme
-2. Use `officecli` commands to build the document with the designed spec
-3. Use `officecli view <file> html` to preview and iterate
-4. For data-heavy docs, call `@reed` for research, then `@ui` for visualization design
-
-**OfficeCLI commands agents can use:**
-- `officecli create <file>` — Create blank document
-- `officecli add <file> <path> --type slide --prop title="..." ` — Add content
-- `officecli set <file> <path> --prop font=Arial --prop size=24` — Modify elements
-- `officecli get <file> <path> --json` — Read structured content
-- `officecli view <file> html` — Preview as HTML
-- `officecli view <file> outline` — View structure as text
-- `officecli watch <file>` — Live preview browser
-- `officecli merge <template> <output> <data.json>` — Template merge
-- `officecli batch <file> --input updates.json` — Batch operations
-- `officecli validate <file>` — Validate document
-- `officecli set <file> <path> --prop fill="#1e3a5f" --prop color="#ffffff"` — Custom styling with APEX palette colors
-
-**Supported formats:** .docx (Word), .xlsx (Excel), .pptx (PowerPoint)
-
-## Mirage — Unified Virtual File System
-
-Mirage mounts 50+ backends (S3, Google Drive, Slack, Gmail, GitHub, Redis, Postgres, etc.)
-as one filesystem. Any agent that knows bash can read, grep, and pipe across every backend.
-
-| Command | Action |
-|---------|--------|
-| `/mirage <bash command>` | Execute command across mounted backends |
-
-**Mirage MCP tools:**
-- `mirage_execute` — Run bash across all backends
-- `mirage_workspace_create` — Create workspace with configured backends
-- `mirage_workspace_snapshot` — Snapshot workspace to tar
-- `mirage_workspace_load` — Load workspace from snapshot
-- `mirage_provision` — Provision files across backends
-
-**Example agent commands:**
-```
-/mirage grep -r "error" /s3/logs/
-/mirage cp /gdrive/report.csv /data/
-/mirage ls /slack/channels/general/
-/mirage wc -l /github/repos/*/issues.jsonl
-```
-
-**Requires:** Python 3.11+ (`pip install mirage-ai`) or Node.js 20+ (`npm install -g @struktoai/mirage-cli`)
 
 ## APEX Hands — Tool System
 

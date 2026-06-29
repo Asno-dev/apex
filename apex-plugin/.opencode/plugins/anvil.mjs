@@ -68,7 +68,7 @@ System design → @arch∥@research (par)
 
 DYNAMIC ACTIVATION:
 Orchestrator routes → one agent → calls peers only when a specific need arises mid-execution.
-@perf profiling finds SQL injection → calls @sec. Chain: @rex→@sec→@infra.
+@perf profiling finds SQL injection → calls @sec. Chain: @perf→@sec→@infra.
 Zero pre-loading. Only needed agents activate.
 
 CROSS-DELEGATION:

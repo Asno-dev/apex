@@ -29,7 +29,7 @@ Issue/bug report → @debug→@review (seq) | System design → @arch∥@researc
 **Select** — `/apex select kai,rex` → only those active. All others dormant.
 
 ## Dynamic Activation
-Orchestrator routes → one agent works → calls peer agents only when a specific need surfaces mid-execution. `@perf` profiling finds SQL injection → calls `@sec`. `@ui` painting form needs backend → calls `@infra`. Chain: `@rex→@sec→@infra`. Zero agents pre-loaded.
+Orchestrator routes → one agent works → calls peer agents only when a specific need surfaces mid-execution. `@perf` profiling finds SQL injection → calls `@sec`. `@ui` painting form needs backend → calls `@infra`. Chain: `@perf→@sec→@infra`. Zero agents pre-loaded.
 
 ## Cross-Delegation
 Any agent calls any peer anytime with `@peerName`. Called peer has full authority, can call further peers. Direct peer-to-peer, never re-orchestrate. Called peers shut down after output — control returns to caller.

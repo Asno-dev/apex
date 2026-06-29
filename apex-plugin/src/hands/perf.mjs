@@ -1,6 +1,6 @@
 import { execSync, spawnSync } from "child_process"
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs"
-import { join } from "path"
+import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync } from "fs"
+import { join, dirname, basename } from "path"
 
 function run(cmd, cwd) {
   try {
@@ -95,7 +95,7 @@ export async function handleTool(name, args) {
       const profileFile = join(process.cwd(), `.apex-cpu-profile-${Date.now()}.cpuprofile`)
       const cmd = args.command.startsWith("node ") ? args.command : `node ${args.command}`
       try {
-        run(`node --cpu-prof --cpu-prof-dir="${require('path').dirname(profileFile)}" --cpu-prof-name="${require('path').basename(profileFile)}" -e "setTimeout(() => {}, ${duration * 1000})"`)
+        run(`node --cpu-prof --cpu-prof-dir="${dirname(profileFile)}" --cpu-prof-name="${basename(profileFile)}" -e "setTimeout(() => {}, ${duration * 1000})"`)
       } catch { }
       const profileExists = existsSync(profileFile)
       return {
@@ -128,7 +128,7 @@ export async function handleTool(name, args) {
         const distFiles = run("find . -path '*/dist/*.js' -o -path '*/build/*.js' 2>nul | head -5", process.cwd())
         if (distFiles.trim()) {
           const sizes = distFiles.split("\n").filter(Boolean).map(f => {
-            try { return { file: f, size: require("fs").statSync(f.trim()).size } } catch { return null }
+            try { return { file: f, size: statSync(f.trim()).size } } catch { return null }
           }).filter(Boolean)
           baseline.metrics.bundleSize = sizes.reduce((s, f) => s + f.size, 0)
         } else {
@@ -192,11 +192,11 @@ export async function handleTool(name, args) {
       }
       const rows = distFiles.slice(0, 10).map(f => {
         try {
-          const size = require("fs").statSync(f).size
+          const size = statSync(f).size
           return `| ${f} | ${(size / 1024).toFixed(1)}KB |`
         } catch { return null }
       }).filter(Boolean).join("\n")
-      const totalSize = distFiles.slice(0, 10).reduce((s, f) => { try { return s + require("fs").statSync(f).size } catch { return s } }, 0)
+      const totalSize = distFiles.slice(0, 10).reduce((s, f) => { try { return s + statSync(f).size } catch { return s } }, 0)
       return {
         content: [{
           type: "text",

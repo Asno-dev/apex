@@ -47,7 +47,7 @@ APEX is a 10-agent orchestrator + specialist system for any CLI coding agent. Th
 
 ## Dynamic Activation
 
-Orchestrator routes → one agent works → calls peers only when a specific need arises mid-execution. `@perf` profiling finds SQL injection → calls `@sec`. Chain: `@rex→@sec→@infra`. Zero pre-loading.
+Orchestrator routes → one agent works → calls peers only when a specific need arises mid-execution. `@perf` profiling finds SQL injection → calls `@sec`. Chain: `@perf→@sec→@infra`. Zero pre-loading.
 
 ## Cross-Delegation
 

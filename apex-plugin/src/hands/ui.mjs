@@ -124,10 +124,9 @@ export async function handleTool(name, args) {
           const imgMatch = line.match(/<img[^>]+>/)
           if (imgMatch && !imgMatch[0].includes("alt=")) issues.push({ file: f, line: i + 1, issue: "Missing alt on <img>", severity: "HIGH" })
           const btnMatch = line.match(/<button[^>]*>(?!\s*aria-label)/)
-          if (btnMatch && !line.includes("aria-label")) { }
+          if (btnMatch && !line.includes("aria-label")) issues.push({ file: f, line: i + 1, issue: "Button missing aria-label", severity: "MEDIUM" })
           if (line.includes("<input") && !line.includes("aria-label") && !line.includes("aria-labelledby")) issues.push({ file: f, line: i + 1, issue: "Input missing aria-label/labelledby", severity: "MEDIUM" })
           if (line.includes("<div") && (line.includes("onClick") || line.includes("onclick"))) issues.push({ file: f, line: i + 1, issue: "<div> used as clickable — use <button>", severity: "MEDIUM" })
-          if (line.includes("color:") || line.includes("background:")) { }
         }
       }
       const high = issues.filter(i => i.severity === "HIGH").length

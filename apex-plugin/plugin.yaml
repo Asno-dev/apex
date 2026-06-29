@@ -18,6 +18,17 @@ provides_commands:
   - apex-review
   - apex-flex
 provides_skills:
+  - apex
+  - apex-arch
+  - apex-ui
+  - apex-debug
+  - apex-perf
+  - apex-sec
+  - apex-infra
+  - apex-nova
+  - apex-reed
+  - apex-review
+  - apex-flex
   - refactor
   - ui-generate
   - debug-protocol

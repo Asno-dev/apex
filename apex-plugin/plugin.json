@@ -3,47 +3,11 @@
   "displayName": "APEX v2 — Senior Engineering Team",
   "description": "10-agent orchestrator + specialists for any CLI coding agent. Routes requests to specialists: @arch architecture, @ui UI, @debug debugging, @perf performance, @sec security, @infra infra, @nova creative, @reed research, @review PR review, @flex MVP scoping.",
   "version": "2.0.0",
-  "author": "APEX Team",
+  "author": {
+    "name": "asno-dev",
+    "url": "https://github.com/asno-dev/apex"
+  },
   "tags": ["architecture", "design", "debugging", "performance", "security", "infrastructure", "code-review", "research", "mvp", "testing", "deployment"],
   "categories": ["workflow", "code-quality", "design", "testing", "deployment"],
-  "config": {
-    "hooks": {
-      "preToolUse": {
-        "script": "security-check",
-        "description": "Block destructive commands"
-      },
-      "postToolUse": {
-        "script": "lint-check",
-        "description": "Run linter after edits"
-      }
-    },
-    "agents": [
-      "architect",
-      "ui-painter",
-      "debugger",
-      "perf-engineer",
-      "security",
-      "infra",
-      "creative",
-      "researcher",
-      "reviewer",
-      "founder"
-    ],
-    "skills": [
-      "refactor",
-      "ui-generate",
-      "debug-protocol",
-      "perf-audit",
-      "sec-review",
-      "pr-review",
-      "system-design",
-      "research",
-      "mvp-cut",
-      "full-stack-scaffold",
-      "test-harness",
-      "bug-patch",
-      "requirements-to-spec",
-      "deploy-pipeline"
-    ]
-  }
+  "hooks": "./adapters/claude-code/hooks.json"
 }

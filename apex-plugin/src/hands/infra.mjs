@@ -1,5 +1,6 @@
 import { execSync } from "child_process"
 import { existsSync, readFileSync } from "fs"
+import { join } from "path"
 
 function run(cmd, cwd) {
   try {
@@ -254,5 +255,3 @@ export async function handleTool(name, args) {
       throw new Error(`Unknown tool: ${name}`)
   }
 }
-
-import { join } from "path"
