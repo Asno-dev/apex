@@ -1,7 +1,7 @@
 {
   "name": "@asno-dev/apex",
-  "version": "2.0.0",
-  "description": "APEX v2 — 10-agent senior engineering team. Works with 16+ coding agents: Claude Code, Codex, Cursor, Cline, Copilot, Windsurf, Gemini, Devin, Hermes, Pi, OpenCode, and more.",
+  "version": "3.0.0",
+  "description": "APEX — 10-agent senior engineering team. Works with 16+ coding agents: Claude Code, Codex, Cursor, Cline, Copilot, Windsurf, Gemini, Devin, Hermes, Pi, OpenCode, and more.",
   "main": "index.js",
   "bin": {
     "apex": "./bin/apex.js"
