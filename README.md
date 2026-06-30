@@ -371,7 +371,7 @@ Connect **1000+ external tools** (Gmail, GitHub, Slack, Google Drive, Jira, Line
 
 ```bash
 # Interactive setup wizard
-apex-composio-setup
+node src/composio-setup.mjs
 ```
 
 The wizard will:
@@ -383,8 +383,8 @@ The wizard will:
 ### Status & Sync
 
 ```bash
-apex-composio-status    # Show all connected tools and their status
-apex-composio-sync      # Force refresh tool definitions from backend
+node src/composio-status.mjs          # Show all connected tools and their status
+node src/composio-status.mjs --sync   # Force refresh tool definitions from backend
 ```
 
 ### Usage
