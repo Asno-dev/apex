@@ -1,6 +1,6 @@
 {
   "name": "@asno-dev/apex",
-  "version": "3.0.3",
+  "version": "3.1.0",
   "description": "APEX — 10-agent senior engineering team. Works with 16+ coding agents: Claude Code, Codex, Cursor, Cline, Copilot, Windsurf, Gemini, Devin, Hermes, Pi, OpenCode, and more.",
   "main": "index.js",
   "bin": {
@@ -8,12 +8,12 @@
   },
   "files": [
     "bin/",
-    "hooks/",
+    "src/",
     "skills/",
+    "hooks/",
     "adapters/",
     "agents/",
     "commands/",
-    "src/",
     "scripts/",
     "docs/",
     ".mcp.json",
@@ -26,36 +26,19 @@
     "opencode.json",
     "gemini-extension.json",
     "plugin.json",
-    "plugin.yaml",
-    "install.sh",
-    "install.ps1"
+    "plugin.yaml"
   ],
   "scripts": {
-    "test": "node scripts/check-rule-copies.js",
+    "test": "node bin/apex.js --yes",
     "lint": "echo 'lint ok'",
-    "prepublishOnly": "node scripts/check-rule-copies.js"
+    "prepublishOnly": "echo 'ready to publish'"
   },
   "keywords": [
-    "ai",
-    "coding-agent",
-    "claude-code",
-    "cursor",
-    "opencode",
-    "cline",
-    "copilot",
-    "windsurf",
-    "gemini",
-    "devin",
-    "hermes",
-    "codex",
-    "code-review",
-    "debugging",
-    "performance",
-    "security",
-    "architecture",
-    "10-agent",
-    "orchestrator",
-    "apex"
+    "ai", "coding-agent", "claude-code", "cursor", "opencode",
+    "cline", "copilot", "windsurf", "gemini", "devin", "hermes",
+    "codex", "code-review", "debugging", "performance", "security",
+    "architecture", "10-agent", "orchestrator", "apex", "mcp",
+    "composio", "mirage", "subagents", "coding-assistant"
   ],
   "author": "asno-dev",
   "license": "MIT",

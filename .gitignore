@@ -22,3 +22,11 @@ asno_extracted/
 .gemini/
 .codex/
 .windsurf/
+
+# Installer output
+openclaw-apex.md
+openclaw-package.json
+pi-extension.json
+antigravity-extension.json
+hermes-apex.yaml
+swival-apex-skill.md

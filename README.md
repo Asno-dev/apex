@@ -169,58 +169,56 @@ Activate only specific agents for a focused session.
 
 APEX supports **16+ coding agents** with dedicated adapters for each.
 
-### Interactive Installer (Recommended)
+### Quick Install (Recommended)
 
 ```bash
-# Auto-detect agents and install interactively
+# Run interactive installer — detects your agents, lets you pick
 npx @asno-dev/apex
 
-# Or install globally
+# Or install globally first
 npm install -g @asno-dev/apex
-
-# Non-interactive mode (install for all detected agents)
-npx @asno-dev/apex --yes
 ```
 
 The installer will:
-1. **Detect** all coding agents installed on your system
+1. **Auto-detect** all coding agents installed on your system
 2. **Show an interactive picker** — use ↑↓ to navigate, Space to toggle, Enter to confirm
 3. **Install** the correct config files for each selected agent (agents, commands, MCP servers, rules)
-4. **No manual setup needed** — everything is configured automatically
+4. **Zero manual setup** — everything is configured automatically
 
-Supported agents: Claude Code, Cursor, Windsurf, Cline, GitHub Copilot, Gemini CLI, Codex, Devin, Hermes, OpenCode, Kiro, Pi, Antigravity, OpenClaw, CodeWhale, Swival.
-
-### Shell Installers
+### Options
 
 ```bash
-# macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/asno-dev/apex/main/install.sh | sh
-
-# Windows (PowerShell 7+)
-.\install.ps1
+npx @asno-dev/apex              # Interactive mode (default)
+npx @asno-dev/apex --yes        # Auto-install for all detected agents
+npx @asno-dev/apex --all        # Install for ALL 16 agents (even undetected ones)
 ```
 
-### Per-Agent Details
+### Supported Agents
 
-| Agent | Config File(s) | Notes |
-|:------|:---------------|:------|
-| **Claude Code** | `~/.claude/plugin.json` + `~/.claude/agents/*` + `~/.claude/commands/*` | 10 subagents, 8 commands, 3 MCP servers |
-| **Codex CLI** | `~/.codex/plugin.json` + `~/.codex/agents/*.toml` + `~/.codex/mcp.toml` | 10 subagents, 8 commands, 3 MCP servers |
-| **Cursor** | `.cursor/rules/apex.mdc` + `.cursor/agents/*.mdc` + `.cursor/commands/*.md` | 10 agents, 8 commands, MCP |
-| **Gemini CLI** | `~/.gemini/extension.json` + `~/.gemini/agents/*` + `~/.gemini/commands/*.toml` | 10 agents, 8 commands, 3 MCP servers |
-| **Windsurf** | `.windsurf/rules/apex.md` + `.windsurf/agents/*` + `.windsurf/workflows/*` | 10 agents, 8 workflows |
-| **Cline / Kilo Code** | `.clinerules` (project root) | Comprehensive rules file |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | Full APEX instructions |
-| **GitHub Copilot CLI** | `~/.config/gh-copilot/config.yml` (via CLI plugin) | Subcommands |
-| **Devin** | `~/.devin/plugin.yaml` + `~/.devin/mcp.json` + `~/.devin/agents/*` | 10 agents, MCP |
-| **Hermes** | `~/.hermes/apex-features.yaml` + `~/.hermes/plugin.yaml` | Feature flags |
-| **OpenCode** | `opencode.json` + `.opencode/*` | Native subagent support |
-| **Pi Agent** | `~/.pi/extension.json` | MCP servers |
-| **Antigravity** | `~/.agy/antigravity-extension.json` | Extension + MCP |
-| **Kiro** | `~/.kiro/steering/apex.md` | Steering instructions |
-| **Swival** | `~/.swival/apex.md` (via skills add) | Skill rules |
-| **OpenClaw** | `~/.clawhub/apex.md` + `~/.clawhub/package.json` | Package + MCP |
-| **CodeWhale** | `AGENTS.md` (project root) | Auto-reads |
+| Agent | What Gets Installed |
+|:------|:-------------------|
+| **Claude Code** | `.claude/plugin.json` + agents + commands + skills |
+| **Cursor** | `.cursor/mcp.json` + rules + agents + commands |
+| **Windsurf** | `.windsurf/mcp.json` + rules + agents + workflows |
+| **Cline / Kilo** | `.clinerules` (project root) |
+| **GitHub Copilot** | `.github/copilot-instructions.md` |
+| **Gemini CLI** | `.gemini/extension.json` + agents + commands |
+| **Codex CLI** | `.codex/plugin.json` + agents + mcp.toml |
+| **Devin** | `.devin/plugin.yaml` + agents + mcp.json |
+| **Hermes** | `.hermes/plugin.yaml` + features |
+| **OpenCode** | `opencode.json` + plugin |
+| **Kiro** | `.kiro/steering/apex.md` |
+| **Pi Agent** | `pi-extension.json` |
+| **Antigravity** | `antigravity-extension.json` |
+| **OpenClaw** | `openclaw-package.json` |
+| **CodeWhale** | `AGENTS.md` |
+| **Swival** | `swival-apex-skill.md` + `.swival/mcp.json` |
+
+### What Gets Installed (Universal)
+
+- `AGENTS.md` — Agent instructions (every agent reads this)
+- `.mcp.json` — 3 MCP servers (apex-hands, mirage-vfs, apex-composio)
+- `skills/` — 25 specialized skill files
 
 ---
 
