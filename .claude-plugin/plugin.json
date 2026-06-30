@@ -1,0 +1,10 @@
+{
+  "name": "apex",
+  "version": "3.0.0",
+  "description": "APEX v2 — 10-agent senior engineering team. Routes requests to specialists: @arch architecture, @ui UI, @debug debugging, @perf performance, @sec security, @infra infra, @nova creative, @reed research, @review PR review, @flex MVP scope.",
+  "author": {
+    "name": "asno-dev",
+    "url": "https://github.com/asno-dev/apex"
+  },
+  "hooks": "./adapters/claude-code/hooks.json"
+}

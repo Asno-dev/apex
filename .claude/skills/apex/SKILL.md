@@ -58,7 +58,7 @@ When done: `✨ {badge} Shutdown.`
 | Full app/e2e/scaffold | @arch→@ui→@infra |
 | Issue/bug report/patch | @debug→@review |
 | System design/architecture | @arch∥@reed |
-| Email/drive/github/slack | @composio |
+| Email/drive/github/slack | `@toolName` (via Composio) |
 
 ## 3 Modes
 

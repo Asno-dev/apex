@@ -56,11 +56,6 @@
       "description": "[Fnd] Flex the Founder — MVP scope cutter",
       "file": ".opencode/agents/flex.md",
       "mode": "subagent"
-    },
-    "composio": {
-      "description": "[Composio] Execute ANY of the user's 1000+ connected external tools. Auto-detects which tools are connected.",
-      "file": ".opencode/agents/composio.md",
-      "mode": "subagent"
     }
   },
   "mcp": {
@@ -145,7 +140,7 @@
       "template": "/mirage "
     },
     "apex-composio-setup": {
-      "description": "[Composio] Start the Composio webapp to connect tools",
+      "description": "[Composio] Connect tools — paste API key, get OAuth link, done",
       "template": "/composio-setup "
     },
     "apex-composio-status": {

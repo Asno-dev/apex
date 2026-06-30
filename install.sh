@@ -54,15 +54,13 @@ SUMMARY+=("✓ AGENTS.md")
 # --- Claude Code ---
 if command -v claude &>/dev/null; then
   if [ "$MODE" = "global" ]; then
-    mkdir -p "$HOME/.claude/agents" "$HOME/.claude/skills"
+    mkdir -p "$HOME/.claude/skills"
     cp "$APEX_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md" 2>/dev/null || true
-    [ -d "$APEX_DIR/.claude/agents" ] && cp "$APEX_DIR/.claude/agents/"*.md "$HOME/.claude/agents/" 2>/dev/null || true
     [ -d "$APEX_DIR/skills" ] && cp -r "$APEX_DIR/skills/"* "$HOME/.claude/skills/" 2>/dev/null || true
     green "Claude Code (global ~/.claude/)"
   else
-    mkdir -p "$DEST_DIR/.claude/agents" "$DEST_DIR/.claude/skills"
+    mkdir -p "$DEST_DIR/.claude/skills"
     cp "$APEX_DIR/CLAUDE.md" "$DEST_DIR/CLAUDE.md" 2>/dev/null || true
-    [ -d "$APEX_DIR/.claude/agents" ] && cp "$APEX_DIR/.claude/agents/"*.md "$DEST_DIR/.claude/agents/" 2>/dev/null || true
     [ -d "$APEX_DIR/skills" ] && cp -r "$APEX_DIR/skills/"* "$DEST_DIR/.claude/skills/" 2>/dev/null || true
     green "Claude Code (local)"
   fi
@@ -88,15 +86,13 @@ SUMMARY+=("✓ Cursor")
 # --- OpenCode ---
 if [ "$MODE" = "global" ]; then
   OPENCODE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
-  mkdir -p "$OPENCODE_DIR/plugins" "$OPENCODE_DIR/command"
+  mkdir -p "$OPENCODE_DIR/plugins"
   [ -f "$APEX_DIR/adapters/opencode/apex.mjs" ] && cp "$APEX_DIR/adapters/opencode/apex.mjs" "$OPENCODE_DIR/plugins/apex.mjs" 2>/dev/null || true
-  [ -d "$APEX_DIR/.opencode/command" ] && cp "$APEX_DIR/.opencode/command/"*.md "$OPENCODE_DIR/command/" 2>/dev/null || true
   green "OpenCode (global ~/.config/opencode/)"
 else
-  mkdir -p "$DEST_DIR/.opencode/plugins" "$DEST_DIR/.opencode/command"
+  mkdir -p "$DEST_DIR/.opencode/plugins"
   [ -f "$APEX_DIR/opencode.json" ] && cp "$APEX_DIR/opencode.json" "$DEST_DIR/opencode.json" 2>/dev/null || true
   [ -f "$APEX_DIR/adapters/opencode/apex.mjs" ] && cp "$APEX_DIR/adapters/opencode/apex.mjs" "$DEST_DIR/.opencode/plugins/apex.mjs" 2>/dev/null || true
-  [ -d "$APEX_DIR/.opencode/command" ] && cp "$APEX_DIR/.opencode/command/"*.md "$DEST_DIR/.opencode/command/" 2>/dev/null || true
   green "OpenCode (local)"
 fi
 SUMMARY+=("✓ OpenCode")

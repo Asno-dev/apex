@@ -46,6 +46,16 @@ Orchestrator routes → one agent works → calls peers only when a specific nee
 
 Any agent calls any peer with `@peerName`. Called peer has full authority and can call further peers. Control returns to caller after output.
 
+## First Principles (all agents, all actions)
+
+1. **YAGNI.** Does this need to exist? → No → skip it.
+2. **Reuse.** Already in this codebase? → Reuse it, don't rewrite.
+3. **Stdlib.** Stdlib does it? → Use it.
+4. **Platform.** Native platform feature? → Use it.
+5. **Dependency.** Installed dependency? → Use it.
+6. **One line.** Can it be one line? → One line.
+7. **Minimum.** Only then: the minimum that works.
+
 ## Core Laws
 
 1. **Explore before write.** Grep codebase first. Reuse over rebuild.
@@ -61,6 +71,18 @@ Any agent calls any peer with `@peerName`. Called peer has full authority and ca
 56 MCP tools across 10 agents via `apex-hands` server.
 Composio (1000+ tools) and Mirage VFS (50+ backends) available.
 Call pattern: `toolName({ param: "value" })`
+
+## Composio
+
+Connect external tools via Composio (1000+ tools):
+
+```bash
+/composio-setup          # Connect a tool — paste API key, get OAuth link
+/composio-status         # Show connected tools
+/composio-sync           # Force sync from backend
+```
+
+After connecting, use `@toolName` (e.g. `@gmail`, `@github`) to invoke tools.
 
 ## Help
 

@@ -19,9 +19,8 @@ $Summary += "✓ AGENTS.md"
 
 # --- Claude Code ---
 if (Has-Command claude) {
-  $null = New-Item -ItemType Directory -Path "$ProjectDir\.claude\agents", "$ProjectDir\.claude\skills" -Force
+  $null = New-Item -ItemType Directory -Path "$ProjectDir\.claude\skills" -Force
   Copy-Item "$ApexDir\CLAUDE.md" "$ProjectDir\CLAUDE.md" -Force -ErrorAction SilentlyContinue
-  Copy-Item "$ApexDir\.claude\agents\*.md" "$ProjectDir\.claude\agents\" -Force -ErrorAction SilentlyContinue
   if (Test-Path "$ApexDir\skills") { Copy-Item "$ApexDir\skills\*" "$ProjectDir\.claude\skills\" -Recurse -Force }
   Write-Green "Claude Code"
   $Summary += "✓ Claude Code"
@@ -38,10 +37,9 @@ $Summary += "✓ Cursor"
 
 # --- OpenCode ---
 if (Has-Command opencode) {
-  $null = New-Item -ItemType Directory -Path "$ProjectDir\.opencode\plugins", "$ProjectDir\.opencode\command" -Force
+  $null = New-Item -ItemType Directory -Path "$ProjectDir\.opencode\plugins" -Force
   Copy-Item "$ApexDir\opencode.json" "$ProjectDir\opencode.json" -Force -ErrorAction SilentlyContinue
   Copy-Item "$ApexDir\adapters\opencode\apex.mjs" "$ProjectDir\.opencode\plugins\apex.mjs" -Force -ErrorAction SilentlyContinue
-  Copy-Item "$ApexDir\.opencode\command\*.md" "$ProjectDir\.opencode\command\" -Force -ErrorAction SilentlyContinue
   Write-Green "OpenCode"
   $Summary += "✓ OpenCode"
 } else {

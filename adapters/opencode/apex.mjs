@@ -75,7 +75,7 @@ ROUTING:
 code/refactor→@arch  ui/component→@ui  bug/error→@debug  slow/perf→@perf
 auth/sec→@sec  deploy/CI→@infra  creative→@nova  research→@reed
 review/PR→@review  scope/MVP→@flex  full-app→arch→ui→infra  patch→debug→review
-tools/send/email/drive/github→@composio  @toolName→auto-routes-to-composio
+email/drive/github/slack→@toolName  @gmail/@github→composio-connected-tools
 
 MODES:
 1. DIRECT @agent = main. Call @peerName.
@@ -148,7 +148,7 @@ export default async ({ client } = {}) => {
           const tools = cfg.connectedTools || [];
           if (tools.length > 0) {
             const mentions = tools.map(s => `@${s}`).join(', ');
-            composioSection = `\nCONNECTED TOOLS: ${mentions}\nUse @composio or @toolName to invoke.`;
+            composioSection = `\nCONNECTED TOOLS: ${mentions}\nUse @toolName (e.g. @gmail) to invoke.`;
           }
         }
       } catch {}

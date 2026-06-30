@@ -7,7 +7,7 @@ const path = require('path');
 const APEX_DIR = __dirname;
 
 module.exports = {
-  version: '2.0.0',
+  version: '3.0.0',
   dir: APEX_DIR,
   skillsDir: path.join(APEX_DIR, 'skills'),
   hooksDir: path.join(APEX_DIR, 'hooks'),

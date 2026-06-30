@@ -1,22 +1,13 @@
 # APEX v2 — Installation Guide for All Agents
 
-## Universal Install (any project)
-
-```bash
-npx @asno-dev/apex
-```
-
-This detects your installed agents and copies the right files.
-
----
-
-## Per-Agent Install
+## Per-Agent Install (Primary — Marketplace)
 
 ### Claude Code
 ```
 /plugin marketplace add asno-dev/apex
+/plugin install apex@apex
 ```
-Then restart Claude Code. APEX loads automatically.
+Restart Claude Code. APEX loads automatically.
 
 ### Codex CLI
 ```
@@ -24,50 +15,32 @@ codex plugin marketplace add asno-dev/apex
 ```
 Open `/plugins`, select APEX, install. Then open `/hooks`, trust the lifecycle hooks.
 
+### GitHub Copilot CLI
+```
+copilot plugin marketplace add asno-dev/apex
+copilot plugin install apex@apex
+```
+
+### OpenCode
+Add to `opencode.json`:
+```json
+{ "plugin": ["@asno-dev/apex"] }
+```
+Or from a local checkout:
+```json
+{ "plugin": ["./.opencode/plugins/apex.mjs"] }
+```
+
 ### Gemini CLI
 ```
 gemini extensions install https://github.com/asno-dev/apex
 ```
 Loads AGENTS.md as always-on context every session.
 
-### Antigravity CLI (agy)
+### Antigravity CLI
 ```
 agy plugin install https://github.com/asno-dev/apex
 ```
-
-### OpenCode
-Add to `opencode.json`:
-```json
-{
-  "plugin": ["@asno-dev/apex"]
-}
-```
-Or from a local checkout:
-```json
-{
-  "plugin": ["./.opencode/plugins/apex.mjs"]
-}
-```
-
-### Cursor
-Copy `.cursor/rules/apex.mdc` to your project's `.cursor/rules/` directory.
-APEX loads as an always-on project rule.
-
-### Windsurf
-Copy `.windsurf/rules/apex.md` to your project's `.windsurf/` directory.
-
-### Cline / Kilo Code
-Copy `.clinerules` to your project root.
-Or copy `adapters/cline/apex.md` content into your `.clinerules`.
-
-### GitHub Copilot (editor)
-Copy `.github/copilot-instructions.md` to your project's `.github/` directory.
-
-### GitHub Copilot CLI
-```
-copilot plugin marketplace add asno-dev/apex
-```
-Or instruction-only: copy `AGENTS.md` to your project root.
 
 ### Devin CLI
 ```
@@ -85,10 +58,28 @@ Restart Hermes after installing.
 pi install git:github.com/asno-dev/apex
 ```
 
+### Swival
+```
+swival skills add --global https://github.com/asno-dev/apex
+swival skills add apex
+```
+
 ### OpenClaw
 ```
 clawhub install apex
 ```
+
+### Cursor
+Copy `.cursor/rules/apex.mdc` to your project's `.cursor/rules/` directory.
+
+### Windsurf
+Copy `.windsurf/rules/apex.md` to your project's `.windsurf/` directory.
+
+### Cline / Kilo Code
+Copy `.clinerules` to your project root.
+
+### GitHub Copilot (editor)
+Copy `.github/copilot-instructions.md` to your project's `.github/` directory.
 
 ### Kiro
 Copy `adapters/kiro/apex.md` to `~/.kiro/steering/` (global) or `.kiro/steering/` (project).
@@ -96,20 +87,16 @@ Copy `adapters/kiro/apex.md` to `~/.kiro/steering/` (global) or `.kiro/steering/
 ### CodeWhale
 Copy `AGENTS.md` to your project root. CodeWhale reads it automatically.
 
-### Swival
+### npm (npx auto-installer — fallback)
+```bash
+npx @asno-dev/apex
 ```
-swival skills add --global https://github.com/asno-dev/apex
-swival skills add apex
-```
-
-### VS Code + Codex Extension
-Copy `AGENTS.md` to your project root or `~/.codex/AGENTS.md` (global).
+Auto-detects your installed agents and copies the right files.
 
 ---
 
-## After Install — Usage
+## Usage
 
-### Basic Usage
 ```
 @arch refactor this         → Max compresses code
 @ui build a login form      → Zara paints WCAG AA form
@@ -128,7 +115,7 @@ Copy `AGENTS.md` to your project root or `~/.codex/AGENTS.md` (global).
 - **Team (default)** — Auto-routes to best agent, dynamic peers
 - **Select** — `/apex select kai,rex` = only those agents active
 
-### Mode Commands (OpenCode/Claude Code)
+### Mode Commands
 ```
 /apex team        → Team mode (default)
 /apex select a,b  → Select specific agents
@@ -175,9 +162,10 @@ Every agent has domain-specific tools via the `apex-hands` MCP server:
 
 ### Composio (1000+ tools)
 ```
-/composio-setup    → Start Composio webapp
-/composio-status   → Show connected tools
-@composio          → Execute any connected tool
+/composio-setup        → Connect a tool
+/composio-status       → Show connected tools
+/composio-sync         → Force sync from backend
+@toolName              → Invoke (e.g. @gmail, @github)
 ```
 
 ### Mirage VFS (50+ backends)
@@ -187,7 +175,7 @@ Every agent has domain-specific tools via the `apex-hands` MCP server:
 
 ### OfficeCLI (Word, Excel, PowerPoint)
 ```
-/docs create a report    → Word document
-/excel build a budget    → Excel spreadsheet
-/ppt make a presentation → PowerPoint deck
+/docs create a report
+/excel build a budget
+/ppt make a presentation
 ```

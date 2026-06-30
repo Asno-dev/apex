@@ -2,7 +2,7 @@
   "name": "apex",
   "displayName": "APEX v2 — Senior Engineering Team",
   "description": "10-agent orchestrator + specialists for any CLI coding agent. Routes requests to specialists: @arch architecture, @ui UI, @debug debugging, @perf performance, @sec security, @infra infra, @nova creative, @reed research, @review PR review, @flex MVP scoping.",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": {
     "name": "asno-dev",
     "url": "https://github.com/asno-dev/apex"
