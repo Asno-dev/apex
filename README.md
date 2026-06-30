@@ -36,12 +36,15 @@
 ## 🚀 Quick Start
 
 ```bash
-# Install globally via npm
-npm install -g @asno-dev/apex
+# Run interactive installer — detects your agents, lets you pick
+npx @asno-dev/apex
 
-# Run universal installer — detects all your coding agents
+# Or install globally first
+npm install -g @asno-dev/apex
 npx @asno-dev/apex
 ```
+
+The installer detects your coding agents, shows a picker, and configures everything automatically.
 
 That's it. Now talk to your coding agent:
 
@@ -65,9 +68,9 @@ apex-docs                          → Create Word/Excel/PPT documents
 apex-excel
 apex-ppt
 
-apex-composio-setup                → Connect 1000+ external tools (Gmail, GitHub, Slack, etc.)
-apex-composio-status               → Show connected tools status
-apex-composio-sync                 → Force sync from Composio backend
+node src/composio-setup.mjs       → Connect 1000+ external tools (Gmail, GitHub, Slack, etc.)
+node src/composio-status.mjs      → Show connected tools status
+node src/composio-status.mjs --sync → Force sync from Composio backend
 
 apex-mirage ls /s3/                → Virtual filesystem across 50+ backends
 
@@ -166,17 +169,26 @@ Activate only specific agents for a focused session.
 
 APEX supports **16+ coding agents** with dedicated adapters for each.
 
-### Universal Installer (Recommended)
+### Interactive Installer (Recommended)
 
 ```bash
-# Auto-detect installed agents and configure all of them
+# Auto-detect agents and install interactively
 npx @asno-dev/apex
 
 # Or install globally
 npm install -g @asno-dev/apex
+
+# Non-interactive mode (install for all detected agents)
+npx @asno-dev/apex --yes
 ```
 
-The CLI auto-detects which coding agents are installed on your system and copies the right configuration files for each one. It handles all the format differences — `plugin.json` for Claude Code, `.mdc` for Cursor, `plugin.json + toml` for Codex, `extension.json + toml` for Gemini, and so on.
+The installer will:
+1. **Detect** all coding agents installed on your system
+2. **Show an interactive picker** — use ↑↓ to navigate, Space to toggle, Enter to confirm
+3. **Install** the correct config files for each selected agent (agents, commands, MCP servers, rules)
+4. **No manual setup needed** — everything is configured automatically
+
+Supported agents: Claude Code, Cursor, Windsurf, Cline, GitHub Copilot, Gemini CLI, Codex, Devin, Hermes, OpenCode, Kiro, Pi, Antigravity, OpenClaw, CodeWhale, Swival.
 
 ### Shell Installers
 
@@ -221,9 +233,9 @@ All APEX commands use the `apex-` prefix for clean namespacing — no collisions
 | `apex-docs` | Create/edit Word documents via OfficeCLI |
 | `apex-excel` | Create/edit Excel spreadsheets via OfficeCLI |
 | `apex-ppt` | Create PowerPoint presentations via OfficeCLI |
-| `apex-composio-setup` | Connect external tools — paste API key, get OAuth link |
-| `apex-composio-status` | Show connected tools and API key status |
-| `apex-composio-sync` | Force sync from Composio backend |
+| `node src/composio-setup.mjs` | Connect external tools — paste API key, get OAuth link |
+| `node src/composio-status.mjs` | Show connected tools and API key status |
+| `node src/composio-status.mjs --sync` | Force sync from Composio backend |
 | `apex-mirage <command>` | Execute commands across mounted virtual filesystem backends |
 | `/apex team\|select\|off\|status\|help` | APEX mode control |
 
