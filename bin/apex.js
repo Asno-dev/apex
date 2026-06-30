@@ -207,8 +207,8 @@ function picker(options, promptText, preSelected) {
       try { readline.cursorTo(stdout, 1, 4 + cursor); } catch {}
     }
 
-    function onKey(_, key) {
-      if (done) return;
+    function onKey(str, key) {
+      if (done || !key) return;
       if (key.name === 'up' || key.name === 'k') { cursor = Math.max(0, cursor - 1); render(); }
       else if (key.name === 'down' || key.name === 'j') { cursor = Math.min(options.length - 1, cursor + 1); render(); }
       else if (key.name === 'space') { selected.has(cursor) ? selected.delete(cursor) : selected.add(cursor); render(); }
