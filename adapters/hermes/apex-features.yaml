@@ -1,0 +1,155 @@
+name: apex-features
+version: 3.0.0
+description: APEX v2 — Full feature set: 10 agents, 3 MCP servers, Composio, Mirage, OfficeCLI
+author: asno-dev
+
+mcp_servers:
+  - name: apex-hands
+    command: ["node", "src/hands-server.mjs"]
+    type: local
+    tools: 56
+    description: 56 domain tools across 10 agent domains
+
+  - name: mirage-vfs
+    command: ["node", "src/mirage-server.mjs"]
+    type: local
+    tools: 6
+    description: Virtual filesystem across 50+ backends
+
+  - name: apex-composio
+    command: ["node", "src/composio-server.mjs"]
+    type: local
+    tools: 1000+
+    description: External tool bridge via Composio
+
+agents:
+  - name: arch
+    label: "[Arch] Max"
+    role: Architect
+    routing: code/refactor/system-design
+    tools: [blast_radius, dep_graph, complexity, extract_refactor, compose_check, module_boundary]
+
+  - name: ui
+    label: "[UI] Zara"
+    role: UI/UX Designer
+    routing: UI/component/page
+    tools: [contrast, palette_extract, a11y_audit, responsive_test, component_search]
+
+  - name: debug
+    label: "[Dbg] Kai"
+    role: Debugger
+    routing: bug/error/crash
+    tools: [reproduce, stack_walk, log_mine, bisect_run, guard_inject, var_watch]
+
+  - name: perf
+    label: "[Perf] Rex"
+    role: Performance Engineer
+    routing: slow/memory/performance
+    tools: [profile, memory_profile, baseline_capture, measure, bundle_analyze, big_o]
+
+  - name: sec
+    label: "[Sec] Vex"
+    role: Security Engineer
+    routing: auth/input/secrets/vuln
+    tools: [vuln_scan, secret_find, input_trace, auth_map, owasp_score, dependency_audit]
+
+  - name: infra
+    label: "[Inf] Io"
+    role: Infrastructure Engineer
+    routing: deploy/docker/CI/k8s
+    tools: [docker_lint, k8s_validate, ci_check, deploy_dry, rollback_plan, health_check]
+
+  - name: nova
+    label: "[Nov] Nova"
+    role: Creative
+    routing: ideas/library/creative
+    tools: [poc_gen, lib_compass, alt_angle, trend_sniff, downside_check, approach_matrix]
+
+  - name: reed
+    label: "[Res] Dr.Reed"
+    role: Researcher
+    routing: best-way/which/research
+    tools: [compare, complexity_calc, evidence_search, tradeoff_matrix, recommend]
+
+  - name: review
+    label: "[Rev] Rila"
+    role: Reviewer
+    routing: PR/merge/quality
+    tools: [diff_cat, anti_pattern, quality_gate, praise_find, review_card]
+
+  - name: flex
+    label: "[Fnd] Flex"
+    role: Founder/PM
+    routing: scope/MVP
+    tools: [value_cost, mvp_cut, risk_matrix, roadmap, effort_estimate]
+
+commands:
+  - command: apex
+    description: APEX mode control — team|select a,b|off|status|help
+
+  - command: docs
+    description: Create/edit Word documents via OfficeCLI
+
+  - command: excel
+    description: Create/edit Excel spreadsheets via OfficeCLI
+
+  - command: ppt
+    description: Create PowerPoint presentations via OfficeCLI
+
+  - command: composio-setup
+    description: Connect external tools (Gmail, GitHub, Slack, etc.)
+
+  - command: composio-status
+    description: Show connected tools and API key status
+
+  - command: composio-sync
+    description: Force sync from Composio backend
+
+  - command: mirage
+    description: Execute commands across virtual filesystem backends
+
+modes:
+  - name: direct
+    description: @agent = main agent with full authority
+
+  - name: team
+    description: Orchestrator routes to best agent (default)
+
+  - name: select
+    description: /apex select a,b — only those agents active
+
+integrations:
+  composio:
+    enabled: true
+    tools: 1000+
+    setup_cmd: "node src/composio-setup.mjs"
+    status_cmd: "node src/composio-status.mjs"
+    usage: "@toolName (e.g. @gmail, @github, @slack)"
+
+  mirage:
+    enabled: true
+    backends: 50+
+    setup_cmd: "pip install mirage-ai && npm install -g @struktoai/mirage-cli"
+    usage: "apex-mirage <bash command>"
+
+  officecli:
+    enabled: true
+    tools: [docs, excel, ppt]
+    usage: "Tell agent what document/spreadsheet/presentation you need"
+
+task_states:
+  think: 🧠
+  explore: 🔍
+  work: ⚡
+  fix: 🔧
+  verify: ✅
+  done: ✨
+
+laws:
+  - "Explore before write. Grep codebase first. Reuse over rebuild."
+  - "Self-review. Shortest correct path? Existing patterns used?"
+  - "Read first. Map blast radius before writing."
+  - "Diff only. No preamble. Signal-to-noise max."
+  - "Shutdown law. Every agent terminates after final output."
+  - "Fix at composition point. One guard > guard in every caller."
+  - "Comment→rename. Twice→extract. Inherit→compose."

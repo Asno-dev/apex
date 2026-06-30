@@ -1,6 +1,30 @@
 {
   "name": "apex",
-  "version": "2.0.0",
-  "description": "APEX v2 — 10-agent senior engineering team. @arch architect, @ui UI, @debug debug, @perf perf, @sec security, @infra infra, @nova creative, @reed research, @review review, @flex MVP.",
-  "contextFileName": "AGENTS.md"
+  "version": "3.0.0",
+  "description": "APEX v2 — 10-agent senior engineering team. Full feature set: 10 agents (@arch, @ui, @debug, @perf, @sec, @infra, @nova, @reed, @review, @flex), 3 MCP servers (56-1000+ tools), Composio integration (Gmail, GitHub, Slack, etc.), Mirage VFS (50+ backends), OfficeCLI (Word, Excel, PPT), 3 operating modes (Direct, Team, Select).",
+  "contextFileName": "AGENTS.md",
+  "agents": ["arch", "ui", "debug", "perf", "sec", "infra", "nova", "reed", "review", "flex"],
+  "commands": ["apex", "docs", "excel", "ppt", "composio-setup", "composio-status", "composio-sync", "mirage"],
+  "mcpServers": {
+    "apex-hands": {
+      "type": "local",
+      "command": ["node", "src/hands-server.mjs"]
+    },
+    "mirage-vfs": {
+      "type": "local",
+      "command": ["node", "src/mirage-server.mjs"]
+    },
+    "apex-composio": {
+      "type": "local",
+      "command": ["node", "src/composio-server.mjs"]
+    }
+  },
+  "features": {
+    "modes": ["direct", "team", "select"],
+    "composio": true,
+    "mirage": true,
+    "officecli": true,
+    "agentChains": true,
+    "dynamicPeers": true
+  }
 }

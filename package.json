@@ -1,6 +1,6 @@
 {
   "name": "@asno-dev/apex",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "APEX — 10-agent senior engineering team. Works with 16+ coding agents: Claude Code, Codex, Cursor, Cline, Copilot, Windsurf, Gemini, Devin, Hermes, Pi, OpenCode, and more.",
   "main": "index.js",
   "bin": {
@@ -11,9 +11,14 @@
     "hooks/",
     "skills/",
     "adapters/",
+    "agents/",
+    "commands/",
     "src/",
     "scripts/",
     "docs/",
+    ".mcp.json",
+    ".cursorrules",
+    ".clinerules",
     "index.js",
     "AGENTS.md",
     "CLAUDE.md",

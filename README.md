@@ -1,5 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/npm/v/@asno-dev/apex?style=flat-square&color=0ea5e9" alt="npm version" />
+  <img src="https://img.shields.io/npm/dm/@asno-dev/apex?style=flat-square&color=38bdf8" alt="npm downloads" />
   <img src="https://img.shields.io/npm/l/@asno-dev/apex?style=flat-square&color=22c55e" alt="license" />
   <img src="https://img.shields.io/badge/agents-10-blueviolet?style=flat-square" alt="agents" />
   <img src="https://img.shields.io/badge/tools-56-orange?style=flat-square" alt="tools" />
@@ -24,7 +25,9 @@
   <a href="#-installation">Installation</a> •
   <a href="#-skills">Skills</a> •
   <a href="#-mcp-servers">MCP Servers</a> •
+  <a href="#%EF%B8%8F-commands">Commands</a> •
   <a href="#-composio-integration">Composio</a> •
+  <a href="#%F0%9F%94%8B-mirage-vfs">Mirage VFS</a> •
   <a href="#-license">License</a>
 </p>
 
@@ -36,28 +39,41 @@
 # Install globally via npm
 npm install -g @asno-dev/apex
 
-# Or run directly with npx (auto-detects your coding agents)
+# Run universal installer — detects all your coding agents
 npx @asno-dev/apex
-
-# Or install from source
-git clone https://github.com/asno-dev/apex.git
-cd apex
-npm install
 ```
 
-Then just talk to your coding agent:
+That's it. Now talk to your coding agent:
 
 ```
-@arch refactor this           → Max compresses your code
-@ui build a login form        → Zara paints a WCAG AA compliant form
-@debug fix this error         → Kai runs 5-step debug protocol
-@perf this is slow            → Rex profiles & optimizes
-@sec review auth code         → Vex scans for OWASP Top 10
-@infra dockerize this         → Io outputs production-grade config
-@nova any ideas?              → Nova proposes non-obvious angles
-@reed best caching strategy   → Dr. Reed compares options with evidence
-@review check this code       → Rila gives structured PR review
-@flex what's the MVP?         → Flex scores Value×Cost and cuts scope
+@arch refactor this                → Max compresses your code
+@ui build a login form             → Zara paints a WCAG AA form
+@debug fix this error              → Kai runs 5-step debug protocol
+@perf this is slow                 → Rex profiles & optimizes
+@sec review auth code              → Vex scans for OWASP Top 10
+@infra dockerize this              → Io outputs production-grade config
+@nova any ideas?                   → Nova proposes non-obvious angles
+@reed best caching strategy        → Dr. Reed compares options with evidence
+@review check this code            → Rila gives structured PR review
+@flex what's the MVP?              → Flex scores Value×Cost and cuts scope
+```
+
+### Built-in Commands
+
+```
+apex-docs                          → Create Word/Excel/PPT documents
+apex-excel
+apex-ppt
+
+apex-composio-setup                → Connect 1000+ external tools (Gmail, GitHub, Slack, etc.)
+apex-composio-status               → Show connected tools status
+apex-composio-sync                 → Force sync from Composio backend
+
+apex-mirage ls /s3/                → Virtual filesystem across 50+ backends
+
+/apex team                         → Switch to team mode (default)
+/apex select a,b                   → Activate only specific agents
+/apex status                       → Show current mode and active agents
 ```
 
 ---
@@ -130,8 +146,8 @@ Address a specific agent directly. That agent becomes the lead with full authori
 Activate only specific agents for a focused session.
 
 ```
-/apex select kai,rex      # Only debugger and performance active
-/apex select arch,ui,infra  # Architecture + UI + Infrastructure
+/apex select kai,rex              # Only debugger and performance active
+/apex select arch,ui,infra        # Architecture + UI + Infrastructure
 ```
 
 ### Mode Commands
@@ -148,9 +164,9 @@ Activate only specific agents for a focused session.
 
 ## 📦 Installation
 
-APEX supports **16+ coding agents** with dedicated adapters for each. Choose your preferred installation method.
+APEX supports **16+ coding agents** with dedicated adapters for each.
 
-### Universal (npm)
+### Universal Installer (Recommended)
 
 ```bash
 # Auto-detect installed agents and configure all of them
@@ -160,158 +176,7 @@ npx @asno-dev/apex
 npm install -g @asno-dev/apex
 ```
 
-The CLI auto-detects which coding agents are installed on your system and copies the right configuration files for each one.
-
-### Per-Agent Installation
-
-<details>
-<summary><strong>Claude Code</strong></summary>
-
-**Via marketplace (recommended):**
-```bash
-/plugin marketplace add asno-dev/apex
-/plugin install apex@apex
-```
-Restart Claude Code. APEX loads automatically.
-
-**Manual:**
-Copy `CLAUDE.md` to your project root and the `skills/` directory to `.claude/skills/`.
-</details>
-
-<details>
-<summary><strong>Codex CLI</strong></summary>
-
-```bash
-codex plugin marketplace add asno-dev/apex
-```
-Open `/plugins`, select APEX, install. Then open `/hooks`, trust the lifecycle hooks.
-</details>
-
-<details>
-<summary><strong>GitHub Copilot CLI</strong></summary>
-
-```bash
-copilot plugin marketplace add asno-dev/apex
-copilot plugin install apex@apex
-```
-</details>
-
-<details>
-<summary><strong>OpenCode</strong></summary>
-
-Add to your `opencode.json`:
-```json
-{
-  "plugin": ["@asno-dev/apex"]
-}
-```
-Or from a local checkout:
-```json
-{
-  "plugin": ["./.opencode/plugins/apex.mjs"]
-}
-```
-</details>
-
-<details>
-<summary><strong>Gemini CLI</strong></summary>
-
-```bash
-gemini extensions install https://github.com/asno-dev/apex
-```
-Loads `AGENTS.md` as always-on context every session.
-</details>
-
-<details>
-<summary><strong>Cursor</strong></summary>
-
-Copy `.cursor/rules/apex.mdc` to your project's `.cursor/rules/` directory.
-
-Or use the installer:
-```bash
-npx @asno-dev/apex
-```
-</details>
-
-<details>
-<summary><strong>Windsurf</strong></summary>
-
-Copy `.windsurf/rules/apex.md` to your project's `.windsurf/` directory.
-</details>
-
-<details>
-<summary><strong>Cline / Kilo Code</strong></summary>
-
-Copy `.clinerules` to your project root.
-</details>
-
-<details>
-<summary><strong>GitHub Copilot (Editor)</strong></summary>
-
-Copy `.github/copilot-instructions.md` to your project's `.github/` directory.
-</details>
-
-<details>
-<summary><strong>Devin CLI</strong></summary>
-
-```bash
-devin plugins install asno-dev/apex
-```
-</details>
-
-<details>
-<summary><strong>Hermes Agent</strong></summary>
-
-```bash
-hermes plugins install asno-dev/apex --enable
-```
-Restart Hermes after installing.
-</details>
-
-<details>
-<summary><strong>Pi Agent</strong></summary>
-
-```bash
-pi install git:github.com/asno-dev/apex
-```
-</details>
-
-<details>
-<summary><strong>Antigravity CLI</strong></summary>
-
-```bash
-agy plugin install https://github.com/asno-dev/apex
-```
-</details>
-
-<details>
-<summary><strong>Kiro</strong></summary>
-
-Copy `adapters/kiro/apex.md` to `~/.kiro/steering/` (global) or `.kiro/steering/` (project).
-</details>
-
-<details>
-<summary><strong>Swival</strong></summary>
-
-```bash
-swival skills add --global https://github.com/asno-dev/apex
-swival skills add apex
-```
-</details>
-
-<details>
-<summary><strong>OpenClaw</strong></summary>
-
-```bash
-clawhub install apex
-```
-</details>
-
-<details>
-<summary><strong>CodeWhale</strong></summary>
-
-Copy `AGENTS.md` to your project root. CodeWhale reads it automatically.
-</details>
+The CLI auto-detects which coding agents are installed on your system and copies the right configuration files for each one. It handles all the format differences — `plugin.json` for Claude Code, `.mdc` for Cursor, `plugin.json + toml` for Codex, `extension.json + toml` for Gemini, and so on.
 
 ### Shell Installers
 
@@ -319,13 +184,48 @@ Copy `AGENTS.md` to your project root. CodeWhale reads it automatically.
 # macOS / Linux
 curl -fsSL https://raw.githubusercontent.com/asno-dev/apex/main/install.sh | sh
 
-# Local from repo
-./install.sh              # Project-local install
-./install.sh --global     # Global install to ~/.config/
-
 # Windows (PowerShell 7+)
 .\install.ps1
 ```
+
+### Per-Agent Details
+
+| Agent | Config File(s) | Notes |
+|:------|:---------------|:------|
+| **Claude Code** | `~/.claude/plugin.json` + `~/.claude/agents/*` + `~/.claude/commands/*` | 10 subagents, 8 commands, 3 MCP servers |
+| **Codex CLI** | `~/.codex/plugin.json` + `~/.codex/agents/*.toml` + `~/.codex/mcp.toml` | 10 subagents, 8 commands, 3 MCP servers |
+| **Cursor** | `.cursor/rules/apex.mdc` + `.cursor/agents/*.mdc` + `.cursor/commands/*.md` | 10 agents, 8 commands, MCP |
+| **Gemini CLI** | `~/.gemini/extension.json` + `~/.gemini/agents/*` + `~/.gemini/commands/*.toml` | 10 agents, 8 commands, 3 MCP servers |
+| **Windsurf** | `.windsurf/rules/apex.md` + `.windsurf/agents/*` + `.windsurf/workflows/*` | 10 agents, 8 workflows |
+| **Cline / Kilo Code** | `.clinerules` (project root) | Comprehensive rules file |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Full APEX instructions |
+| **GitHub Copilot CLI** | `~/.config/gh-copilot/config.yml` (via CLI plugin) | Subcommands |
+| **Devin** | `~/.devin/plugin.yaml` + `~/.devin/mcp.json` + `~/.devin/agents/*` | 10 agents, MCP |
+| **Hermes** | `~/.hermes/apex-features.yaml` + `~/.hermes/plugin.yaml` | Feature flags |
+| **OpenCode** | `opencode.json` + `.opencode/*` | Native subagent support |
+| **Pi Agent** | `~/.pi/extension.json` | MCP servers |
+| **Antigravity** | `~/.agy/antigravity-extension.json` | Extension + MCP |
+| **Kiro** | `~/.kiro/steering/apex.md` | Steering instructions |
+| **Swival** | `~/.swival/apex.md` (via skills add) | Skill rules |
+| **OpenClaw** | `~/.clawhub/apex.md` + `~/.clawhub/package.json` | Package + MCP |
+| **CodeWhale** | `AGENTS.md` (project root) | Auto-reads |
+
+---
+
+## ⌨️ Commands
+
+All APEX commands use the `apex-` prefix for clean namespacing — no collisions with built-in agent commands.
+
+| Command | Description |
+|:--------|:------------|
+| `apex-docs` | Create/edit Word documents via OfficeCLI |
+| `apex-excel` | Create/edit Excel spreadsheets via OfficeCLI |
+| `apex-ppt` | Create PowerPoint presentations via OfficeCLI |
+| `apex-composio-setup` | Connect external tools — paste API key, get OAuth link |
+| `apex-composio-status` | Show connected tools and API key status |
+| `apex-composio-sync` | Force sync from Composio backend |
+| `apex-mirage <command>` | Execute commands across mounted virtual filesystem backends |
+| `/apex team\|select\|off\|status\|help` | APEX mode control |
 
 ---
 
@@ -334,6 +234,7 @@ curl -fsSL https://raw.githubusercontent.com/asno-dev/apex/main/install.sh | sh
 APEX includes **25 pre-built skills** — composable, multi-step workflows that any agent can invoke.
 
 ### Agent Skills (10)
+
 Each agent has its own core skill defining its persona, behavior, and domain rules:
 
 | Skill | Agent | Description |
@@ -350,6 +251,7 @@ Each agent has its own core skill defining its persona, behavior, and domain rul
 | `apex-flex` | Flex | Value-cost scoring, MVP cutting, effort estimation |
 
 ### Workflow Skills (15)
+
 Pre-composed multi-agent workflows for common engineering tasks:
 
 | Skill | Agents Used | Description |
@@ -373,9 +275,9 @@ Pre-composed multi-agent workflows for common engineering tasks:
 
 ## 🔧 MCP Servers
 
-APEX provides **3 MCP (Model Context Protocol) servers** with **56 purpose-built tools** across all 10 agents.
+APEX provides **3 MCP (Model Context Protocol) servers** with **56 purpose-built tools** across all 10 agents, plus **6 virtual filesystem tools** and **1000+ external tool bridges**.
 
-### apex-hands — Agent Domain Tools
+### 1. apex-hands — 56 Agent Domain Tools
 
 The primary MCP server. 56 tools organized by agent domain:
 
@@ -392,13 +294,10 @@ The primary MCP server. 56 tools organized by agent domain:
 | `@review` | `diff_cat` `anti_pattern` `quality_gate` `praise_find` `review_card` | Code review |
 | `@flex` | `value_cost` `mvp_cut` `risk_matrix` `roadmap` `effort_estimate` | Product management |
 
-#### MCP Configuration
-
-For agents that support MCP, add to your config:
-
+**MCP Config:**
 ```json
 {
-  "mcp": {
+  "mcpServers": {
     "apex-hands": {
       "type": "local",
       "command": ["node", "src/hands-server.mjs"]
@@ -407,13 +306,14 @@ For agents that support MCP, add to your config:
 }
 ```
 
-### mirage-vfs — Virtual Filesystem
+### 2. mirage-vfs — Virtual Filesystem (50+ Backends)
 
-50+ backend support for filesystem operations across cloud storage, databases, and more.
+Unified filesystem across S3, GDrive, Slack, Redis, Postgres, and more.
 
+**MCP Config:**
 ```json
 {
-  "mcp": {
+  "mcpServers": {
     "mirage-vfs": {
       "type": "local",
       "command": ["node", "src/mirage-server.mjs"]
@@ -422,21 +322,41 @@ For agents that support MCP, add to your config:
 }
 ```
 
+**Usage:**
 ```
-/mirage <command>    # Execute across mounted backends
+apex-mirage ls /s3/                    — List files in S3 bucket
+apex-mirage cp /gdrive/report.pdf /data/  — Copy from Google Drive
+apex-mirage grep -r error /s3/logs/    — Search across backends
+apex-mirage cat /slack/channel/messages  — Read Slack messages
 ```
 
-### apex-composio — External Tool Bridge
+**Setup:** `pip install mirage-ai && npm install -g @struktoai/mirage-cli`
 
-Bridges 1000+ external tools via Composio (see [Composio Integration](#-composio-integration)).
+### 3. apex-composio — 1000+ External Tool Bridge
 
+Bridges Gmail, GitHub, Slack, Jira, Notion, and 1000+ more tools.
+
+**MCP Config:**
 ```json
 {
-  "mcp": {
+  "mcpServers": {
     "apex-composio": {
       "type": "local",
       "command": ["node", "src/composio-server.mjs"]
     }
+  }
+}
+```
+
+### All 3 MCP Servers in One Config
+
+The root `.mcp.json` includes all three servers:
+```json
+{
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "src/hands-server.mjs"] },
+    "mirage-vfs": { "command": ["node", "src/mirage-server.mjs"] },
+    "apex-composio": { "command": ["node", "src/composio-server.mjs"] }
   }
 }
 ```
@@ -447,36 +367,24 @@ Bridges 1000+ external tools via Composio (see [Composio Integration](#-composio
 
 Connect **1000+ external tools** (Gmail, GitHub, Slack, Google Drive, Jira, Linear, Notion, and more) through [Composio](https://composio.dev).
 
-### Setup via Terminal
-
-Run the interactive setup wizard from your terminal:
+### Setup
 
 ```bash
-# Start the interactive Composio setup wizard
-node src/composio-setup.mjs
+# Interactive setup wizard
+apex-composio-setup
 ```
 
-The setup wizard will:
+The wizard will:
 1. Ask for your **Composio API key** (get one at [composio.dev](https://composio.dev))
-2. Let you select which tools to connect (Gmail, GitHub, Slack, etc.)
+2. Let you select which tools to connect (gmail, github, slack, jira, etc.)
 3. Open an **OAuth link** in your browser for authorization
-4. Save the connection config locally
+4. Save the connection config to `.composio-config.json`
 
-### Check Status
+### Status & Sync
 
 ```bash
-# Show all connected tools and their status
-node src/composio-status.mjs
-```
-
-### In-Agent Commands
-
-Once Composio is set up, you can also manage it from within your coding agent:
-
-```
-/composio-setup          # Interactive setup — paste API key, get OAuth link
-/composio-status         # Show connected tools and status
-/composio-sync           # Force sync from Composio backend
+apex-composio-status    # Show all connected tools and their status
+apex-composio-sync      # Force refresh tool definitions from backend
 ```
 
 ### Usage
@@ -493,37 +401,19 @@ After connecting a tool, invoke it with `@toolName`:
 
 ### Configuration
 
-Composio config is stored locally at `.composio-config.json`:
+Stored at `.composio-config.json` (auto-added to `.gitignore` / `.npmignore`):
 
 ```json
 {
   "apiKey": "ak_your_api_key",
   "userId": "your_user_id",
   "connections": [
-    {
-      "tool": "gmail",
-      "label": "Gmail",
-      "status": "ACTIVE",
-      "authType": "OAUTH2"
-    }
+    { "tool": "gmail", "label": "Gmail", "status": "ACTIVE", "authType": "OAUTH2" }
   ]
 }
 ```
 
-Global config is stored at `~/.apex/config.json`:
-
-```json
-{
-  "userId": "your_user_id",
-  "authConfigs": {
-    "gmail": "ac_xxxxx",
-    "github": "ac_xxxxx"
-  }
-}
-```
-
-> **Note:** API keys and auth configs are stored locally and **never committed** to the repository (`.composio-config.json` is in `.gitignore` and `.npmignore`).
-
+---
 
 ## 🔗 Agent Chains
 
@@ -557,28 +447,12 @@ Use APEX as a Node.js library:
 ```javascript
 const apex = require('@asno-dev/apex');
 
-// Get version
-console.log(apex.version); // "3.0.0"
+console.log(apex.version);          // "3.0.2"
+console.log(apex.agents);           // ['arch', 'ui', 'debug', 'perf', 'sec', 'infra', 'nova', 'reed', 'review', 'flex']
+console.log(apex.listAdapters());   // ['claude-code', 'cursor', 'opencode', 'cline', 'copilot', ...]
 
-// List all agents
-console.log(apex.agents);
-// ['arch', 'ui', 'debug', 'perf', 'sec', 'infra', 'nova', 'reed', 'review', 'flex']
-
-// Get a specific agent's skill content
 const archSkill = apex.getSkill('arch');
-
-// Get the main APEX orchestrator skill
-const mainSkill = apex.getMainSkill();
-
-// Get adapter files for a specific coding agent
 const cursorAdapter = apex.getAdapter('cursor');
-
-// List all available adapters
-const adapters = apex.listAdapters();
-// ['claude-code', 'cursor', 'opencode', 'cline', 'copilot', ...]
-
-// Get AGENTS.md content
-const agentsMd = apex.getAgentsMd();
 ```
 
 ---
@@ -607,47 +481,42 @@ Zara's UI design system includes:
 
 ---
 
-## ⚙️ Configuration Files
+## 📋 Requirements
 
-### `plugin.json` — Marketplace Manifest
-```json
-{
-  "name": "apex",
-  "displayName": "APEX v2 — Senior Engineering Team",
-  "version": "3.0.0",
-  "tags": ["architecture", "design", "debugging", "performance", "security"],
-  "categories": ["workflow", "code-quality", "design", "testing", "deployment"]
-}
-```
+- **Node.js** ≥ 18.0.0
+- At least one supported coding agent installed
 
-### `plugin.yaml` — Capabilities
-Declares all provided hooks, commands, and skills:
-- **Hooks**: `pre_tool_use`, `post_tool_use`
-- **Commands**: `apex`, `apex-arch`, `apex-ui`, `apex-debug`, `apex-perf`, `apex-sec`, `apex-infra`, `apex-nova`, `apex-reed`, `apex-review`, `apex-flex`
-- **Skills**: 25 total (10 agent + 15 workflow)
+### Zero Dependencies
 
-### `opencode.json` — Full OpenCode Configuration
-Complete OpenCode integration with all 10 agents as subagents, 3 MCP servers, and 17 commands.
+APEX has **zero production dependencies**. It uses only Node.js built-in modules:
+- ⚡ Instant install
+- 🔒 No supply chain risk
+- 📦 Tiny package size
 
-### `gemini-extension.json` — Gemini CLI Extension
-Loads `AGENTS.md` as always-on context for every Gemini session.
+---
+
+## 🤝 Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Guidelines
+- Follow the Core Laws in your contributions
+- Keep adapters in sync — run `npm test` before submitting
+- Add skills with proper YAML frontmatter
+- Document new tools in the appropriate `hands/*.mjs` module
 
 ---
 
 ## 🧪 Development
 
 ```bash
-# Clone the repository
 git clone https://github.com/asno-dev/apex.git
 cd apex
-
-# Run validation
 npm test
-
-# The test suite verifies:
-# - All adapter rule files are in sync with AGENTS.md
-# - Skills have valid YAML frontmatter
-# - Plugin manifests are consistent
 ```
 
 ### Project Structure
@@ -655,6 +524,8 @@ npm test
 | Directory | Purpose |
 |:----------|:--------|
 | `adapters/` | Per-agent config files (16 agents) |
+| `agents/` | Canonical agent definitions (10 agents) |
+| `commands/` | Canonical command definitions (8 commands) |
 | `skills/` | SKILL.md files for orchestrator and agents |
 | `src/` | MCP servers and tool implementations |
 | `src/hands/` | Individual tool modules per agent |
@@ -665,55 +536,9 @@ npm test
 
 ---
 
-## 📋 Requirements
-
-- **Node.js** ≥ 18.0.0
-- **npm** ≥ 9.0.0
-- At least one supported coding agent installed
-
-### Zero Dependencies
-
-APEX has **zero production dependencies**. It uses only Node.js built-in modules (`fs`, `path`, `os`, `child_process`). This means:
-- ⚡ Instant install
-- 🔒 No supply chain risk
-- 📦 Tiny package size
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Guidelines
-
-- Follow the [Core Laws](#core-laws) in your contributions
-- Keep adapters in sync — run `npm test` before submitting
-- Add skills with proper YAML frontmatter
-- Document new tools in the appropriate `hands/*.mjs` module
-
----
-
 ## 📄 License
 
 [MIT](LICENSE) © [asno-dev](https://github.com/asno-dev)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-
----
-
-## ⭐ Star History
-
-If APEX helps your workflow, give it a ⭐ on [GitHub](https://github.com/asno-dev/apex)!
 
 ---
 

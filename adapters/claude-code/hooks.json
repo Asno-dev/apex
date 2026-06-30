@@ -9,7 +9,7 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/apex-activate.js\"; exit 0",
             "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\apex-activate.js\" }",
             "timeout": 5,
-            "statusMessage": "Loading APEX team..."
+            "statusMessage": "APEX v2 — Loading 10-agent engineering team..."
           }
         ]
       }
@@ -22,7 +22,7 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/apex-subagent.js\"; exit 0",
             "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\apex-subagent.js\" }",
             "timeout": 5,
-            "statusMessage": "Loading APEX agent context..."
+            "statusMessage": "APEX — Loading subagent context..."
           }
         ]
       }
@@ -35,7 +35,34 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/apex-mode-tracker.js\"; exit 0",
             "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\apex-mode-tracker.js\" }",
             "timeout": 5,
-            "statusMessage": "Tracking APEX mode..."
+            "statusMessage": "APEX — Routing request..."
+          }
+        ]
+      }
+    ],
+    "Command": [
+      {
+        "matcher": "apex|apex-docs|apex-excel|apex-ppt|apex-composio-setup|apex-composio-status|apex-composio-sync|apex-mirage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/apex-command-router.js\" \"${COMMAND}\"; exit 0",
+            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\apex-command-router.js\" \"$env:COMMAND\" }",
+            "timeout": 10,
+            "statusMessage": "APEX — Executing command..."
+          }
+        ]
+      }
+    ],
+    "SubagentResponse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/apex-subagent-response.js\"; exit 0",
+            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\apex-subagent-response.js\" }",
+            "timeout": 5,
+            "statusMessage": "APEX — Processing agent response..."
           }
         ]
       }

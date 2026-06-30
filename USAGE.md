@@ -162,20 +162,20 @@ Every agent has domain-specific tools via the `apex-hands` MCP server:
 
 ### Composio (1000+ tools)
 ```
-/composio-setup        → Connect a tool
-/composio-status       → Show connected tools
-/composio-sync         → Force sync from backend
+apex-composio-setup        → Connect a tool
+apex-composio-status       → Show connected tools
+apex-composio-sync         → Force sync from backend
 @toolName              → Invoke (e.g. @gmail, @github)
 ```
 
 ### Mirage VFS (50+ backends)
 ```
-/mirage <bash command>  → Execute across mounted backends
+apex-mirage <bash command>  → Execute across mounted backends
 ```
 
 ### OfficeCLI (Word, Excel, PowerPoint)
 ```
-/docs create a report
-/excel build a budget
-/ppt make a presentation
+apex-docs create a report
+apex-excel build a budget
+apex-ppt make a presentation
 ```

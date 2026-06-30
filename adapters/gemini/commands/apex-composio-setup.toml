@@ -1,0 +1,31 @@
+[command]
+name = "composio-setup"
+description = "[Composio] Connect tools via apex-composio-setup"
+help = """
+# Composio Setup
+
+Connect external tools via Composio.
+
+## Run
+```bash
+node src/composio-setup.mjs
+# Or with args:
+node src/composio-setup.mjs --api-key ak_your_key --tool gmail
+```
+
+## What it does
+1. Paste your Composio API key (get from https://composio.dev/settings)
+2. Enter a tool slug (e.g. gmail, github, slack, jira, notion)
+3. Opens OAuth link in browser
+4. Done — config saved to `.composio-config.json`
+
+## After connecting
+Use `@toolName` to invoke (e.g. `@gmail`, `@github`, `@slack`)
+
+## Categories
+Email (Gmail, Outlook) | Code (GitHub, GitLab, Bitbucket) | PM (Jira, Linear, Asana, Trello, Notion) | Comms (Slack, Discord, Teams) | CRM (Salesforce, HubSpot) | Cloud (AWS, GCP, Azure) | DB (Postgres, MySQL, MongoDB)
+
+## Related
+- `/composio-status` — Show connected tools
+- `/composio-sync` — Force sync from backend
+"""

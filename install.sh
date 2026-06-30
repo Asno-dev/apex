@@ -1,163 +1,190 @@
 #!/usr/bin/env bash
+# APEX v2 — Universal Installer (Bash)
+# Installs full APEX configuration for ALL detected coding agents
 set -euo pipefail
 
-# APEX v2 — Universal installer for all CLI coding agents
-# Works with: Claude Code, Codex, Cursor, Cline, Kilo, Copilot, Windsurf,
-# Gemini CLI, Devin, Hermes, Pi, Antigravity, OpenCode, OpenClaw, Kiro,
-# CodeWhale, Swival
-#
-# Usage:
-#   npx @asno-dev/apex              # from npm
-#   curl -fsSL https://raw.githubusercontent.com/asno-dev/apex/main/install.sh | sh
-#   ./install.sh                    # local from repo
-#   ./install.sh --global           # global install to ~/.config/
+APEX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GLOBAL="${1:-}"
 
-REPO_URL="https://github.com/asno-dev/apex"
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
+GRAY='\033[0;90m'
+NC='\033[0m'
 
-# Detect local checkout vs curl pipe
-if [ -f "$SCRIPT_DIR/AGENTS.md" ]; then
-  APEX_DIR="$SCRIPT_DIR"
-  echo "  Using local checkout: $APEX_DIR"
-else
-  echo "  Downloading APEX from $REPO_URL..."
-  TMP_DIR=$(mktemp -d)
-  trap "rm -rf $TMP_DIR" EXIT
-  if command -v git &>/dev/null; then
-    git clone --depth 1 "$REPO_URL.git" "$TMP_DIR/apex" 2>/dev/null || {
-      echo "  git clone failed. Check internet connection."
-      exit 1
-    }
-    APEX_DIR="$TMP_DIR/apex/apex-plugin"
-  else
-    echo "  git not found. Install git or use npx @asno-dev/apex"
-    exit 1
+echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║        ⚡ APEX v2 — Universal Installer              ║${NC}"
+echo -e "${CYAN}║  10 agents · 3 MCP servers · 62+ tools · Composio  ║${NC}"
+echo -e "${CYAN}║  Mirage VFS · OfficeCLI · Full agent auto-config   ║${NC}"
+echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}"
+echo ""
+
+detect_agents() {
+  local detected=()
+  local HOME_DIR="$HOME"
+
+  # Check installed commands (most reliable)
+  command -v claude &>/dev/null && detected+=("claude-code") || true
+  command -v cursor &>/dev/null && detected+=("cursor") || true
+  command -v windsurf &>/dev/null && detected+=("windsurf") || true
+  command -v codex &>/dev/null && detected+=("codex") || true
+  command -v gemini &>/dev/null && detected+=("gemini") || true
+  command -v gh &>/dev/null && detected+=("copilot") || true
+  command -v devin &>/dev/null && detected+=("devin") || true
+  command -v hermes &>/dev/null && detected+=("hermes") || true
+  command -v pi &>/dev/null && detected+=("pi") || true
+
+  # Check home config directories (NOT adapters/ source)
+  [[ -d "$HOME_DIR/.claude" ]] && detected+=("claude-code") || true
+  [[ -d "$HOME_DIR/.cursor" ]] && detected+=("cursor") || true
+  [[ -d "$HOME_DIR/.codex" ]] && detected+=("codex") || true
+  [[ -d "$HOME_DIR/.gemini" ]] && detected+=("gemini") || true
+  [[ -d "$HOME_DIR/.devin" ]] && detected+=("devin") || true
+  [[ -d "$HOME_DIR/.hermes" ]] && detected+=("hermes") || true
+  [[ -d "$HOME_DIR/.kiro" ]] && detected+=("kiro") || true
+  [[ -d "$HOME_DIR/.pi" ]] && detected+=("pi") || true
+  [[ -d "$HOME_DIR/.windsurf" ]] && detected+=("windsurf") || true
+
+  # Check project-local configs
+  [[ -f "$APEX_DIR/.clinerules" ]] && detected+=("cline") || true
+  [[ -f "$APEX_DIR/.github/copilot-instructions.md" ]] && detected+=("copilot") || true
+
+  # Check npm global packages
+  if command -v npm &>/dev/null; then
+    local npm_list
+    npm_list=$(npm list -g --depth=0 2>/dev/null || true)
+    echo "$npm_list" | grep -q "@anthropic-ai/claude-code" && detected+=("claude-code") || true
+    echo "$npm_list" | grep -q "cursor" && detected+=("cursor") || true
   fi
+
+  printf '%s\n' "${detected[@]}" | sort -u
+}
+
+install_for_agent() {
+  local agent="$1"
+  echo -e "${YELLOW}  → Configuring $agent...${NC}"
+
+  case "$agent" in
+    claude-code)
+      cp "$APEX_DIR/adapters/claude-code/plugin.json" "$APEX_DIR/.claude/plugin.json" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/claude-code/hooks.json" "$APEX_DIR/.claude/hooks.json" 2>/dev/null || true
+      mkdir -p "$APEX_DIR/.claude/agents" "$APEX_DIR/.claude/commands"
+      cp "$APEX_DIR/adapters/claude-code/agents/"*.md "$APEX_DIR/.claude/agents/" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/claude-code/commands/"*.md "$APEX_DIR/.claude/commands/" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Claude Code: 10 agents, 8 commands, 3 MCP servers${NC}"
+      ;;
+
+    cursor)
+      mkdir -p "$APEX_DIR/.cursor" "$APEX_DIR/.cursor/rules"
+      cp "$APEX_DIR/.mcp.json" "$APEX_DIR/.cursor/mcp.json" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/cursor/rules/apex.mdc" "$APEX_DIR/.cursor/rules/apex.mdc" 2>/dev/null || true
+      mkdir -p "$APEX_DIR/.cursor/agents" "$APEX_DIR/.cursor/commands"
+      cp "$APEX_DIR/adapters/cursor/agents/"*.mdc "$APEX_DIR/.cursor/agents/" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/cursor/commands/"*.md "$APEX_DIR/.cursor/commands/" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Cursor: 10 agents, 8 commands, 3 MCP servers${NC}"
+      ;;
+
+    codex)
+      mkdir -p "$APEX_DIR/.codex/agents"
+      cp "$APEX_DIR/adapters/codex/agents/"*.toml "$APEX_DIR/.codex/agents/" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/codex/mcp.toml" "$APEX_DIR/.codex/mcp.toml" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/codex/plugin.json" "$APEX_DIR/.codex/plugin.json" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/codex/SKILLS.md" "$APEX_DIR/.codex/SKILLS.md" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Codex: 10 agents, 3 MCP servers, skills${NC}"
+      ;;
+
+    windsurf)
+      cp "$APEX_DIR/.mcp.json" "$APEX_DIR/.windsurf/mcp.json" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/windsurf/rules/apex.md" "$APEX_DIR/.windsurf/rules/apex.md" 2>/dev/null || true
+      mkdir -p "$APEX_DIR/.windsurf/agents" "$APEX_DIR/.windsurf/workflows"
+      cp "$APEX_DIR/adapters/windsurf/agents/"*.md "$APEX_DIR/.windsurf/agents/" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/windsurf/workflows/"*.md "$APEX_DIR/.windsurf/workflows/" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Windsurf: 10 agents, 8 workflows, 3 MCP servers${NC}"
+      ;;
+
+    cline)
+      echo -e "    ${GREEN}✓ Cline: uses root .clinerules${NC}"
+      ;;
+
+    copilot)
+      mkdir -p "$APEX_DIR/.github"
+      cp "$APEX_DIR/adapters/copilot/instructions.md" "$APEX_DIR/.github/copilot-instructions.md" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ GitHub Copilot: full APEX instructions${NC}"
+      ;;
+
+    gemini)
+      mkdir -p "$APEX_DIR/.gemini/agents" "$APEX_DIR/.gemini/commands"
+      cp "$APEX_DIR/adapters/gemini/extension.json" "$APEX_DIR/.gemini/extension.json" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/gemini/agents/"*.md "$APEX_DIR/.gemini/agents/" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/gemini/commands/"*.toml "$APEX_DIR/.gemini/commands/" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Gemini CLI: 10 agents, 8 commands, 3 MCP servers${NC}"
+      ;;
+
+    devin)
+      mkdir -p "$APEX_DIR/.devin"
+      cp "$APEX_DIR/adapters/devin/mcp.json" "$APEX_DIR/.devin/mcp.json" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/devin/plugin.yaml" "$APEX_DIR/.devin/plugin.yaml" 2>/dev/null || true
+      for agent in arch ui debug perf sec infra nova reed review flex; do
+        mkdir -p "$APEX_DIR/.devin/agents/$agent"
+        cp "$APEX_DIR/adapters/devin/agents/$agent/AGENT.md" "$APEX_DIR/.devin/agents/$agent/AGENT.md" 2>/dev/null || true
+      done
+      echo -e "    ${GREEN}✓ Devin: 10 agents, 3 MCP servers${NC}"
+      ;;
+
+    hermes)
+      mkdir -p "$APEX_DIR/.hermes"
+      cp "$APEX_DIR/adapters/hermes/apex-features.yaml" "$APEX_DIR/hermes-apex.yaml" 2>/dev/null || true
+      cp "$APEX_DIR/adapters/hermes/plugin.yaml" "$APEX_DIR/.hermes/plugin.yaml" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Hermes: plugin + features${NC}"
+      ;;
+
+    kiro)
+      mkdir -p "$APEX_DIR/.kiro/steering"
+      cp "$APEX_DIR/adapters/kiro/apex.md" "$APEX_DIR/.kiro/steering/apex.md" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Kiro: full APEX instructions${NC}"
+      ;;
+
+    swival)
+      mkdir -p "$APEX_DIR/.swival"
+      cp "$APEX_DIR/adapters/swival/apex.md" "$APEX_DIR/swival-apex-skill.md" 2>/dev/null || true
+      cp "$APEX_DIR/.mcp.json" "$APEX_DIR/.swival/mcp.json" 2>/dev/null || true
+      echo -e "    ${GREEN}✓ Swival: skill + MCP${NC}"
+      ;;
+  esac
+}
+
+# Main
+echo -e "  Detecting installed coding agents..."
+mapfile -t detected_agents < <(detect_agents)
+
+if [ ${#detected_agents[@]} -eq 0 ]; then
+  echo -e "  ${YELLOW}No coding agents detected on this system.${NC}"
+  echo -e "  ${YELLOW}Install an agent first, then run this installer again.${NC}"
+  echo ""
+  echo -e "  ${GRAY}Supported: claude-code, codex, cursor, windsurf, cline,${NC}"
+  echo -e "  ${GRAY}copilot, gemini-cli, devin, hermes, kiro, swival${NC}"
+  exit 1
 fi
 
-DEST_DIR="${1:-$(pwd)}"
-MODE="${2:-local}"
-SUMMARY=()
+echo -e "  ${GREEN}Detected: ${detected_agents[*]}${NC}"
+echo ""
 
-green() { printf "\033[32m  ✓ %s\033[0m\n" "$1"; }
-dim() { printf "\033[2m  ~ %s\033[0m\n" "$1"; }
-bold() { printf "\033[1m%s\033[0m\n" "$1"; }
+# Universal MCP config already in place at .mcp.json
 
-bold "\n  APEX v2 — Senior Engineering Team"
-bold "  =================================\n"
-
-# --- Universal AGENTS.md ---
-cp "$APEX_DIR/AGENTS.md" "$DEST_DIR/AGENTS.md" 2>/dev/null || true
-green "AGENTS.md (universal)"
-SUMMARY+=("✓ AGENTS.md")
-
-# --- Claude Code ---
-if command -v claude &>/dev/null; then
-  if [ "$MODE" = "global" ]; then
-    mkdir -p "$HOME/.claude/skills"
-    cp "$APEX_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md" 2>/dev/null || true
-    [ -d "$APEX_DIR/skills" ] && cp -r "$APEX_DIR/skills/"* "$HOME/.claude/skills/" 2>/dev/null || true
-    green "Claude Code (global ~/.claude/)"
-  else
-    mkdir -p "$DEST_DIR/.claude/skills"
-    cp "$APEX_DIR/CLAUDE.md" "$DEST_DIR/CLAUDE.md" 2>/dev/null || true
-    [ -d "$APEX_DIR/skills" ] && cp -r "$APEX_DIR/skills/"* "$DEST_DIR/.claude/skills/" 2>/dev/null || true
-    green "Claude Code (local)"
-  fi
-  SUMMARY+=("✓ Claude Code")
-else
-  dim "Claude Code: not detected"
-fi
-
-# --- Cursor ---
-if [ "$MODE" = "global" ]; then
-  mkdir -p "$HOME/.cursor/rules"
-  [ -f "$APEX_DIR/.cursorrules" ] && cp "$APEX_DIR/.cursorrules" "$HOME/.cursorrules" 2>/dev/null || true
-  [ -d "$APEX_DIR/.cursor/rules" ] && cp "$APEX_DIR/.cursor/rules/"*.mdc "$HOME/.cursor/rules/" 2>/dev/null || true
-  green "Cursor (global)"
-else
-  mkdir -p "$DEST_DIR/.cursor/rules"
-  [ -f "$APEX_DIR/.cursorrules" ] && cp "$APEX_DIR/.cursorrules" "$DEST_DIR/.cursorrules" 2>/dev/null || true
-  [ -d "$APEX_DIR/.cursor/rules" ] && cp "$APEX_DIR/.cursor/rules/"*.mdc "$DEST_DIR/.cursor/rules/" 2>/dev/null || true
-  green "Cursor (local)"
-fi
-SUMMARY+=("✓ Cursor")
-
-# --- OpenCode ---
-if [ "$MODE" = "global" ]; then
-  OPENCODE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
-  mkdir -p "$OPENCODE_DIR/plugins"
-  [ -f "$APEX_DIR/adapters/opencode/apex.mjs" ] && cp "$APEX_DIR/adapters/opencode/apex.mjs" "$OPENCODE_DIR/plugins/apex.mjs" 2>/dev/null || true
-  green "OpenCode (global ~/.config/opencode/)"
-else
-  mkdir -p "$DEST_DIR/.opencode/plugins"
-  [ -f "$APEX_DIR/opencode.json" ] && cp "$APEX_DIR/opencode.json" "$DEST_DIR/opencode.json" 2>/dev/null || true
-  [ -f "$APEX_DIR/adapters/opencode/apex.mjs" ] && cp "$APEX_DIR/adapters/opencode/apex.mjs" "$DEST_DIR/.opencode/plugins/apex.mjs" 2>/dev/null || true
-  green "OpenCode (local)"
-fi
-SUMMARY+=("✓ OpenCode")
-
-# --- Cline / Kilo ---
-[ -f "$APEX_DIR/.clinerules" ] && cp "$APEX_DIR/.clinerules" "$DEST_DIR/.clinerules" 2>/dev/null || true
-green "Cline/Kilo"
-SUMMARY+=("✓ Cline/Kilo")
-
-# --- GitHub Copilot ---
-mkdir -p "$DEST_DIR/.github"
-[ -f "$APEX_DIR/.github/copilot-instructions.md" ] && cp "$APEX_DIR/.github/copilot-instructions.md" "$DEST_DIR/.github/copilot-instructions.md" 2>/dev/null || true
-green "GitHub Copilot"
-SUMMARY+=("✓ GitHub Copilot")
-
-# --- Windsurf ---
-mkdir -p "$DEST_DIR/.windsurf"
-[ -f "$APEX_DIR/.windsurf/rules.md" ] && cp "$APEX_DIR/.windsurf/rules.md" "$DEST_DIR/.windsurf/rules.md" 2>/dev/null || true
-green "Windsurf"
-SUMMARY+=("✓ Windsurf")
-
-# --- Gemini CLI ---
-if command -v gemini &>/dev/null; then
-  [ -f "$APEX_DIR/gemini-extension.json" ] && cp "$APEX_DIR/gemini-extension.json" "$DEST_DIR/gemini-extension.json" 2>/dev/null || true
-  green "Gemini CLI"
-  SUMMARY+=("✓ Gemini CLI")
-else
-  dim "Gemini CLI: not detected"
-fi
-
-# --- Skills ---
-if [ -d "$APEX_DIR/skills" ]; then
-  mkdir -p "$DEST_DIR/.claude/skills"
-  cp -r "$APEX_DIR/skills/"* "$DEST_DIR/.claude/skills/" 2>/dev/null || true
-  green "Skills (24 skills)"
-  SUMMARY+=("✓ Skills")
-fi
-
-# --- Global ~/.apex/ store ---
-if [ "$MODE" = "global" ]; then
-  mkdir -p "$HOME/.apex"
-  cp -r "$APEX_DIR/"* "$HOME/.apex/" 2>/dev/null || true
-  green "~/.apex/ (full package cache)"
-  SUMMARY+=("✓ ~/.apex/")
-fi
+# Install for each
+for agent in "${detected_agents[@]}"; do
+  install_for_agent "$agent"
+done
 
 echo ""
-bold "  === Summary ==="
-for item in "${SUMMARY[@]}"; do echo "  $item"; done
-
-bold "\n  === Quick Start ==="
-echo "  @arch refactor this         → Max compresses code"
-echo "  @ui build a login form      → Zara paints WCAG AA form"
-echo "  @debug fix this error       → Kai 5-step debug"
-echo "  @perf this is slow          → Rex profiles & optimizes"
-echo "  @sec review auth code       → Vex OWASP scans"
-echo "  @infra dockerize this       → Io outputs production config"
-echo "  @nova any ideas             → Nova proposes novel angles"
-echo "  @reed best caching          → Dr. Reed compares options"
-echo "  @review check this code     → Rila blocks/suggests/praises"
-echo "  @flex what's the MVP?       → Flex scores & cuts scope"
-echo ""
-bold "  === Marketplace Installs ==="
-echo "  Claude Code:  /plugin marketplace add asno-dev/apex"
-echo "  Codex:        codex plugin marketplace add asno-dev/apex"
-echo "  Gemini CLI:   gemini extensions install https://github.com/asno-dev/apex"
-echo "  OpenCode:     add \"@asno-dev/apex\" to opencode.json plugins"
-echo ""
+echo -e "${CYAN}  ╔══════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}  ║  ✓ APEX v2 installed for ${#detected_agents[@]} agent(s)!         ║${NC}"
+echo -e "${CYAN}  ║                                               ║${NC}"
+echo -e "${CYAN}  ║  Use @agentName to invoke any specialist:     ║${NC}"
+echo -e "${CYAN}  ║  @arch  @ui  @debug  @perf  @sec  @infra      ║${NC}"
+echo -e "${CYAN}  ║  @nova  @reed  @review  @flex                 ║${NC}"
+echo -e "${CYAN}  ║                                               ║${NC}"
+echo -e "${CYAN}  ║  apex-docs  apex-excel  apex-ppt — OfficeCLI      ║${NC}"
+echo -e "${CYAN}  ║  apex-composio-setup    — Connect 1000+ tools    ║${NC}"
+echo -e "${CYAN}  ║  apex-mirage <cmd>      — VFS across 50+ backends║${NC}"
+echo -e "${CYAN}  ╚══════════════════════════════════════════════════╝${NC}"

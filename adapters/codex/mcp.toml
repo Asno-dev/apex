@@ -1,0 +1,26 @@
+# APEX MCP Server Configuration for Codex CLI
+# Place in .codex/config.toml or reference from plugin.json
+
+[mcp_servers.apex-hands]
+command = "node"
+args = ["src/hands-server.mjs"]
+description = "56 MCP tools across 10 agents — architecture, UI, debug, perf, sec, infra, nova, research, review, flex"
+env = {}
+disabled = false
+autoApprove = []
+
+[mcp_servers.mirage-vfs]
+command = "node"
+args = ["src/mirage-server.mjs"]
+description = "Virtual filesystem with 50+ backends (S3, GDrive, Slack, etc.) — cross-backend file ops via bash"
+env = {}
+disabled = false
+autoApprove = []
+
+[mcp_servers.apex-composio]
+command = "node"
+args = ["src/composio-server.mjs"]
+description = "1000+ integrated tools via Composio — email (Gmail), GitHub, Slack, Google Drive, Jira, and more"
+env = {}
+disabled = false
+autoApprove = []

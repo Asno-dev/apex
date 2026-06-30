@@ -1,68 +1,28 @@
-#!/usr/bin/env node
 // APEX v2 — Mode tracker hook
-// Tracks /apex mode changes (team/direct/select/off)
-
+// Tracks active mode and selected agents for the session
 const fs = require('fs');
 const path = require('path');
 
 const APEX_DIR = path.resolve(__dirname, '..');
-const STATE_DIR = path.join(APEX_DIR, 'adapters');
-const STATE_PATH = path.join(STATE_DIR, '.apex-active');
-const SELECT_PATH = path.join(STATE_DIR, '.apex-selected');
+const STATE_FILE = path.join(APEX_DIR, '.apex-active');
+const SELECT_FILE = path.join(APEX_DIR, '.apex-selected');
 
-function ensureDir() {
-  if (!fs.existsSync(STATE_DIR)) {
-    fs.mkdirSync(STATE_DIR, { recursive: true });
-  }
-}
-
-function readMode() {
-  try { return fs.readFileSync(STATE_PATH, 'utf8').trim() || 'team'; }
+const mode = (() => {
+  try { return fs.readFileSync(STATE_FILE, 'utf8').trim() || 'team'; }
   catch { return 'team'; }
+})();
+
+const selected = (() => {
+  try { return fs.readFileSync(SELECT_FILE, 'utf8').trim().split(',').map(s => s.trim()).filter(Boolean); }
+  catch { return []; }
+})();
+
+// Export mode info for other hooks
+process.env.APEX_MODE = mode;
+process.env.APEX_SELECTED = selected.join(',');
+
+// Lightweight output for mode changes
+if (process.argv.includes('--verbose')) {
+  const status = `APEX mode: ${mode}${selected.length > 0 ? ` [${selected.join(', ')}]` : ''}`;
+  console.log(status);
 }
-
-function writeMode(mode) {
-  ensureDir();
-  fs.writeFileSync(STATE_PATH, mode);
-}
-
-function readSelected() {
-  try {
-    return fs.readFileSync(SELECT_PATH, 'utf8').trim().split(',').map(s => s.trim()).filter(Boolean);
-  } catch {
-    return [];
-  }
-}
-
-function writeSelected(agents) {
-  ensureDir();
-  fs.writeFileSync(SELECT_PATH, agents.join(','));
-}
-
-// Parse command from input
-const input = process.env.APEX_INPUT || process.argv[2] || '';
-const args = input.trim().toLowerCase().split(/\s+/);
-let response = null;
-
-if (['off', 'team', 'full', 'on'].includes(args[0])) {
-  const mode = args[0] === 'on' || args[0] === 'full' ? 'team' : args[0];
-  writeMode(mode);
-  response = { action: 'mode-change', mode };
-} else if (args[0] === 'select' && args.length > 1) {
-  const agents = args.slice(1).join('').split(',').map(s => s.trim()).filter(Boolean);
-  if (agents.length > 0) {
-    writeMode('select');
-    writeSelected(agents);
-    response = { action: 'select', agents };
-  }
-} else if (args[0] === 'status' || args[0] === 'help' || args[0] === '') {
-  const mode = readMode();
-  const selected = mode === 'select' ? readSelected() : [];
-  response = { action: 'status', mode, selected };
-}
-
-if (response) {
-  process.stdout.write(JSON.stringify(response));
-}
-
-module.exports = { readMode, writeMode, readSelected, writeSelected };

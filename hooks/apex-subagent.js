@@ -1,35 +1,21 @@
-#!/usr/bin/env node
-// APEX v2 — Subagent injection hook
-// Injects APEX agent context into subagents when they start
-
+// APEX v2 — Subagent context hook
+// Injects agent-specific context into subagent sessions
 const fs = require('fs');
 const path = require('path');
 
 const APEX_DIR = path.resolve(__dirname, '..');
-const SKILLS_DIR = path.join(APEX_DIR, 'skills');
+const AGENTS_DIR = path.join(APEX_DIR, 'agents');
 
-function getAgentSkill(agentName) {
-  const skillPath = path.join(SKILLS_DIR, `apex-${agentName}`, 'SKILL.md');
-  try {
-    const skill = fs.readFileSync(skillPath, 'utf8');
-    const match = skill.match(/^---[\s\S]*?---\s*([\s\S]*)$/);
-    return match ? match[1].trim() : skill.trim();
-  } catch {
-    return null;
-  }
+// Get agent name from env or args
+const agentName = process.env.APEX_AGENT || process.argv[2] || '';
+
+if (agentName && fs.existsSync(path.join(AGENTS_DIR, `${agentName}.md`))) {
+  const content = fs.readFileSync(path.join(AGENTS_DIR, `${agentName}.md`), 'utf-8');
+  // Strip YAML frontmatter
+  const match = content.match(/^---[\s\S]*?---\s*([\s\S]*)$/);
+  const instructions = match ? match[1].trim() : content.trim();
+  console.log(instructions);
+} else {
+  // Print agent not found message
+  console.log(`APEX agent context requested but not loaded.`);
 }
-
-// Extract agent name from environment or args
-const agentName = process.env.APEX_AGENT || process.argv[2];
-if (agentName) {
-  const instructions = getAgentSkill(agentName);
-  if (instructions) {
-    process.stdout.write(JSON.stringify({
-      type: 'subagent-injection',
-      agent: agentName,
-      content: instructions
-    }));
-  }
-}
-
-module.exports = { getAgentSkill };

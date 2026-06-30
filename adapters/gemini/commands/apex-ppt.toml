@@ -1,0 +1,20 @@
+[command]
+name = "ppt"
+description = "[PPT] Create PowerPoint presentations via OfficeCLI (apex-ppt)"
+help = """
+# PowerPoint Presentation Creation
+
+Use OfficeCLI to create and edit PowerPoint presentations.
+
+## How to use
+Tell the agent what presentation you need. It will run:
+```bash
+npx office-cli ppt create --path "output.pptx" --title "Presentation Title"
+npx office-cli ppt edit --path "presentation.pptx"
+```
+
+## Examples
+- "Create a pitch deck with 5 slides: title, problem, solution, market, team"
+- "Generate a quarterly review presentation from report.json"
+- "Create a training presentation with slide transitions and speaker notes"
+"""

@@ -1,107 +1,239 @@
-#Requires -Version 7.0
-$ErrorActionPreference = 'Stop'
-$ApexDir = Split-Path -Parent $PSCommandPath
-$ProjectDir = Get-Location
-$Summary = @()
+# APEX v2 — Universal Installer (PowerShell 7+)
+# Installs full APEX configuration for ALL detected coding agents
+param(
+  [switch]$Global,
+  [switch]$DryRun
+)
 
-function Write-Green($m) { Write-Host "  ✓ $m" -ForegroundColor Green }
-function Write-Dim($m) { Write-Host "  ~ $m" -ForegroundColor DarkGray }
-function Write-Bold($m) { Write-Host $m -ForegroundColor White }
-function Has-Command($cmd) { Get-Command $cmd -ErrorAction SilentlyContinue }
+$ErrorActionPreference = "Continue"
+$APEX_DIR = $PSScriptRoot
 
-Write-Bold "`n  APEX v2 — Senior Engineering Team"
-Write-Bold "  =================================`n"
+Write-Host "╔══════════════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║        ⚡ APEX v2 — Universal Installer              ║" -ForegroundColor Cyan
+Write-Host "║  10 agents · 3 MCP servers · 62+ tools · Composio  ║" -ForegroundColor Cyan
+Write-Host "║  Mirage VFS · OfficeCLI · Full agent auto-config   ║" -ForegroundColor Cyan
+Write-Host "╚══════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
 
-# --- Universal AGENTS.md ---
-Copy-Item "$ApexDir\AGENTS.md" "$ProjectDir\AGENTS.md" -Force -ErrorAction SilentlyContinue
-Write-Green "AGENTS.md (universal)"
-$Summary += "✓ AGENTS.md"
+# Detect agent type from environment
+function Get-AgentType {
+  $homeDir = $env:USERPROFILE
+  $localAppData = "$env:LOCALAPPDATA"
+  $detected = @()
 
-# --- Claude Code ---
-if (Has-Command claude) {
-  $null = New-Item -ItemType Directory -Path "$ProjectDir\.claude\skills" -Force
-  Copy-Item "$ApexDir\CLAUDE.md" "$ProjectDir\CLAUDE.md" -Force -ErrorAction SilentlyContinue
-  if (Test-Path "$ApexDir\skills") { Copy-Item "$ApexDir\skills\*" "$ProjectDir\.claude\skills\" -Recurse -Force }
-  Write-Green "Claude Code"
-  $Summary += "✓ Claude Code"
-} else {
-  Write-Dim "Claude Code: not detected"
+  # Check npm global installs first (most reliable)
+  try {
+    $npmGlobals = (npm list -g --depth=0 2>$null) -join " "
+    if ($npmGlobals -match "@anthropic-ai/claude-code") { $detected += "claude-code" }
+    if ($npmGlobals -match "cursor") { $detected += "cursor" }
+  } catch {}
+
+  # Check for agent commands
+  if (Get-Command "claude" -ErrorAction SilentlyContinue) { $detected += "claude-code" }
+  if (Get-Command "cursor" -ErrorAction SilentlyContinue) { $detected += "cursor" }
+  if (Get-Command "windsurf" -ErrorAction SilentlyContinue) { $detected += "windsurf" }
+  if (Get-Command "codex" -ErrorAction SilentlyContinue) { $detected += "codex" }
+  if (Get-Command "gemini" -ErrorAction SilentlyContinue) { $detected += "gemini" }
+  if (Get-Command "gh" -ErrorAction SilentlyContinue) { $detected += "copilot" }
+  if (Get-Command "devin" -ErrorAction SilentlyContinue) { $detected += "devin" }
+  if (Get-Command "hermes" -ErrorAction SilentlyContinue) { $detected += "hermes" }
+  if (Get-Command "pi" -ErrorAction SilentlyContinue) { $detected += "pi" }
+
+  # Check user config directories (NOT adapters/ source)
+  if (Test-Path "$homeDir/.claude") { $detected += "claude-code" }
+  if (Test-Path "$homeDir/.cursor") { $detected += "cursor" }
+  if (Test-Path "$homeDir/.codex") { $detected += "codex" }
+  if (Test-Path "$homeDir/.gemini") { $detected += "gemini" }
+  if (Test-Path "$homeDir/.devin") { $detected += "devin" }
+  if (Test-Path "$homeDir/.hermes") { $detected += "hermes" }
+  if (Test-Path "$homeDir/.kiro") { $detected += "kiro" }
+  if (Test-Path "$homeDir/.pi") { $detected += "pi" }
+  if (Test-Path "$homeDir/.antigravity") { $detected += "antigravity" }
+
+  # Check project-local agent configs (only in project root, NOT adapters/)
+  if (Test-Path "$APEX_DIR/.clinerules") { $detected += "cline" }
+  if (Test-Path "$APEX_DIR/.github/copilot-instructions.md") { $detected += "copilot" }
+  if (Test-Path "$homeDir/.windsurf") { $detected += "windsurf" }
+
+  # Check for VS Code extensions
+  $vscodeDir = "$homeDir/.vscode/extensions"
+  if (Test-Path $vscodeDir) {
+    if (Get-ChildItem "$vscodeDir/cline*" -Directory -ErrorAction SilentlyContinue) { $detected += "cline" }
+    if (Get-ChildItem "$vscodeDir/github.copilot*" -Directory -ErrorAction SilentlyContinue) { $detected += "copilot" }
+  }
+
+  return $detected | Select-Object -Unique
 }
 
-# --- Cursor ---
-$null = New-Item -ItemType Directory -Path "$ProjectDir\.cursor\rules" -Force
-Copy-Item "$ApexDir\.cursorrules" "$ProjectDir\.cursorrules" -Force -ErrorAction SilentlyContinue
-Copy-Item "$ApexDir\.cursor\rules\*.mdc" "$ProjectDir\.cursor\rules\" -Force -ErrorAction SilentlyContinue
-Write-Green "Cursor"
-$Summary += "✓ Cursor"
+function Install-ForAgent {
+  param([string]$Agent)
 
-# --- OpenCode ---
-if (Has-Command opencode) {
-  $null = New-Item -ItemType Directory -Path "$ProjectDir\.opencode\plugins" -Force
-  Copy-Item "$ApexDir\opencode.json" "$ProjectDir\opencode.json" -Force -ErrorAction SilentlyContinue
-  Copy-Item "$ApexDir\adapters\opencode\apex.mjs" "$ProjectDir\.opencode\plugins\apex.mjs" -Force -ErrorAction SilentlyContinue
-  Write-Green "OpenCode"
-  $Summary += "✓ OpenCode"
-} else {
-  Write-Dim "OpenCode: not detected"
+  Write-Host "  → Configuring $Agent..." -ForegroundColor Yellow
+
+  switch ($Agent) {
+    "claude-code" {
+      # MCP config already at .mcp.json (Claude Code reads it from project root)
+      # Plugin config
+      Copy-Item "$APEX_DIR/adapters/claude-code/plugin.json" "$APEX_DIR/.claude/plugin.json" -Force
+      Copy-Item "$APEX_DIR/adapters/claude-code/hooks.json" "$APEX_DIR/.claude/hooks.json" -Force
+      # Agents
+      if (!(Test-Path "$APEX_DIR/.claude/agents")) { New-Item -ItemType Directory "$APEX_DIR/.claude/agents" -Force }
+      Copy-Item "$APEX_DIR/adapters/claude-code/agents/*.md" "$APEX_DIR/.claude/agents/" -Force
+      # Commands
+      if (!(Test-Path "$APEX_DIR/.claude/commands")) { New-Item -ItemType Directory "$APEX_DIR/.claude/commands" -Force }
+      Copy-Item "$APEX_DIR/adapters/claude-code/commands/*.md" "$APEX_DIR/.claude/commands/" -Force
+      Write-Host "    ✓ Claude Code configured: 10 agents, 8 commands, 3 MCP servers" -ForegroundColor Green
+    }
+
+    "cursor" {
+      if (!(Test-Path "$APEX_DIR/.cursor")) { New-Item -ItemType Directory "$APEX_DIR/.cursor" -Force }
+      Copy-Item "$APEX_DIR/.mcp.json" "$APEX_DIR/.cursor/mcp.json" -Force
+      if (!(Test-Path "$APEX_DIR/.cursor/rules")) { New-Item -ItemType Directory "$APEX_DIR/.cursor/rules" -Force }
+      Copy-Item "$APEX_DIR/adapters/cursor/rules/apex.mdc" "$APEX_DIR/.cursor/rules/apex.mdc" -Force
+      if (!(Test-Path "$APEX_DIR/.cursor/agents")) { New-Item -ItemType Directory "$APEX_DIR/.cursor/agents" -Force }
+      Copy-Item "$APEX_DIR/adapters/cursor/agents/*.mdc" "$APEX_DIR/.cursor/agents/" -Force
+      if (!(Test-Path "$APEX_DIR/.cursor/commands")) { New-Item -ItemType Directory "$APEX_DIR/.cursor/commands" -Force }
+      Copy-Item "$APEX_DIR/adapters/cursor/commands/*.md" "$APEX_DIR/.cursor/commands/" -Force
+      Write-Host "    ✓ Cursor configured: 10 agents, 8 commands, 3 MCP servers" -ForegroundColor Green
+    }
+
+    "codex" {
+      if (!(Test-Path "$APEX_DIR/.codex")) { New-Item -ItemType Directory "$APEX_DIR/.codex" -Force }
+      if (!(Test-Path "$APEX_DIR/.codex/agents")) { New-Item -ItemType Directory "$APEX_DIR/.codex/agents" -Force }
+      Copy-Item "$APEX_DIR/adapters/codex/agents/*.toml" "$APEX_DIR/.codex/agents/" -Force
+      Copy-Item "$APEX_DIR/adapters/codex/mcp.toml" "$APEX_DIR/.codex/mcp.toml" -Force
+      Copy-Item "$APEX_DIR/adapters/codex/plugin.json" "$APEX_DIR/.codex/plugin.json" -Force
+      Copy-Item "$APEX_DIR/adapters/codex/SKILLS.md" "$APEX_DIR/.codex/SKILLS.md" -Force
+      Write-Host "    ✓ Codex configured: 10 agents, 3 MCP servers, skills" -ForegroundColor Green
+    }
+
+    "windsurf" {
+      Copy-Item "$APEX_DIR/.mcp.json" "$APEX_DIR/.windsurf/mcp.json" -Force
+      Copy-Item "$APEX_DIR/adapters/windsurf/rules/apex.md" "$APEX_DIR/.windsurf/rules/apex.md" -Force
+      if (!(Test-Path "$APEX_DIR/.windsurf/agents")) { New-Item -ItemType Directory "$APEX_DIR/.windsurf/agents" -Force }
+      Copy-Item "$APEX_DIR/adapters/windsurf/agents/*.md" "$APEX_DIR/.windsurf/agents/" -Force
+      if (!(Test-Path "$APEX_DIR/.windsurf/workflows")) { New-Item -ItemType Directory "$APEX_DIR/.windsurf/workflows" -Force }
+      Copy-Item "$APEX_DIR/adapters/windsurf/workflows/*.md" "$APEX_DIR/.windsurf/workflows/" -Force
+      Write-Host "    ✓ Windsurf configured: 10 agents, 8 workflows, 3 MCP servers" -ForegroundColor Green
+    }
+
+    "cline" {
+      Write-Host "    ✓ Cline configured (uses root .clinerules)" -ForegroundColor Green
+    }
+
+    "copilot" {
+      if (!(Test-Path "$APEX_DIR/.github")) { New-Item -ItemType Directory "$APEX_DIR/.github" -Force }
+      Copy-Item "$APEX_DIR/adapters/copilot/instructions.md" "$APEX_DIR/.github/copilot-instructions.md" -Force
+      Write-Host "    ✓ GitHub Copilot configured: full APEX instructions" -ForegroundColor Green
+    }
+
+    "gemini" {
+      if (!(Test-Path "$APEX_DIR/.gemini")) { New-Item -ItemType Directory "$APEX_DIR/.gemini" -Force }
+      Copy-Item "$APEX_DIR/adapters/gemini/extension.json" "$APEX_DIR/.gemini/extension.json" -Force
+      if (!(Test-Path "$APEX_DIR/.gemini/agents")) { New-Item -ItemType Directory "$APEX_DIR/.gemini/agents" -Force }
+      Copy-Item "$APEX_DIR/adapters/gemini/agents/*.md" "$APEX_DIR/.gemini/agents/" -Force
+      if (!(Test-Path "$APEX_DIR/.gemini/commands")) { New-Item -ItemType Directory "$APEX_DIR/.gemini/commands" -Force }
+      Copy-Item "$APEX_DIR/adapters/gemini/commands/*.toml" "$APEX_DIR/.gemini/commands/" -Force
+      Write-Host "    ✓ Gemini CLI configured: 10 agents, 8 commands, 3 MCP servers" -ForegroundColor Green
+    }
+
+    "devin" {
+      if (!(Test-Path "$APEX_DIR/.devin")) { New-Item -ItemType Directory "$APEX_DIR/.devin" -Force }
+      Copy-Item "$APEX_DIR/adapters/devin/mcp.json" "$APEX_DIR/.devin/mcp.json" -Force
+      Copy-Item "$APEX_DIR/adapters/devin/plugin.yaml" "$APEX_DIR/.devin/plugin.yaml" -Force
+      foreach ($agent in @("arch","ui","debug","perf","sec","infra","nova","reed","review","flex")) {
+        $srcDir = "$APEX_DIR/adapters/devin/agents/$agent"
+        $dstDir = "$APEX_DIR/.devin/agents/$agent"
+        if (!(Test-Path $dstDir)) { New-Item -ItemType Directory $dstDir -Force }
+        Copy-Item "$srcDir/AGENT.md" "$dstDir/AGENT.md" -Force
+      }
+      Write-Host "    ✓ Devin configured: 10 agents, 3 MCP servers" -ForegroundColor Green
+    }
+
+    "kiro" {
+      if (!(Test-Path "$APEX_DIR/.kiro")) { New-Item -ItemType Directory "$APEX_DIR/.kiro" -Force }
+      Copy-Item "$APEX_DIR/adapters/kiro/apex.md" "$APEX_DIR/.kiro/steering/apex.md" -Force
+      Write-Host "    ✓ Kiro configured: full APEX instructions" -ForegroundColor Green
+    }
+
+    "swival" {
+      Copy-Item "$APEX_DIR/adapters/swival/apex.md" "$APEX_DIR/swival-apex-skill.md" -Force
+      if (!(Test-Path "$APEX_DIR/.swival")) { New-Item -ItemType Directory "$APEX_DIR/.swival" -Force }
+      Copy-Item "$APEX_DIR/.mcp.json" "$APEX_DIR/.swival/mcp.json" -Force
+      Write-Host "    ✓ Swival configured: skill + MCP" -ForegroundColor Green
+    }
+
+    "pi" {
+      Copy-Item "$APEX_DIR/adapters/pi/extension.json" "$APEX_DIR/pi-extension.json" -Force
+      Write-Host "    ✓ Pi Agent configured: extension + MCP" -ForegroundColor Green
+    }
+
+    "antigravity" {
+      Copy-Item "$APEX_DIR/adapters/antigravity/extension.json" "$APEX_DIR/antigravity-extension.json" -Force
+      Write-Host "    ✓ Antigravity configured: extension + MCP" -ForegroundColor Green
+    }
+
+    "openclaw" {
+      Copy-Item "$APEX_DIR/adapters/openclaw/package.json" "$APEX_DIR/openclaw-package.json" -Force
+      Write-Host "    ✓ OpenClaw configured: package + MCP" -ForegroundColor Green
+    }
+
+    "codewhale" {
+      Copy-Item "$APEX_DIR/adapters/codewhale/AGENTS.md" "$APEX_DIR/AGENTS.md" -Force
+      Write-Host "    ✓ CodeWhale configured: AGENTS.md + MCP" -ForegroundColor Green
+    }
+
+    "hermes" {
+      Copy-Item "$APEX_DIR/adapters/hermes/apex-features.yaml" "$APEX_DIR/hermes-apex.yaml" -Force
+      if (!(Test-Path "$APEX_DIR/.hermes")) { New-Item -ItemType Directory "$APEX_DIR/.hermes" -Force }
+      Copy-Item "$APEX_DIR/adapters/hermes/plugin.yaml" "$APEX_DIR/.hermes/plugin.yaml" -Force
+      Write-Host "    ✓ Hermes configured: plugin + features" -ForegroundColor Green
+    }
+  }
 }
 
-# --- Cline / Kilo Code ---
-Copy-Item "$ApexDir\.clinerules" "$ProjectDir\.clinerules" -Force -ErrorAction SilentlyContinue
-Write-Green "Cline/Kilo"
-$Summary += "✓ Cline/Kilo"
+# Main
+$detectedAgents = Get-AgentType
 
-# --- GitHub Copilot ---
-$null = New-Item -ItemType Directory -Path "$ProjectDir\.github" -Force
-Copy-Item "$ApexDir\.github\copilot-instructions.md" "$ProjectDir\.github\copilot-instructions.md" -Force -ErrorAction SilentlyContinue
-Write-Green "GitHub Copilot"
-$Summary += "✓ GitHub Copilot"
-
-# --- Windsurf ---
-$null = New-Item -ItemType Directory -Path "$ProjectDir\.windsurf" -Force
-Copy-Item "$ApexDir\.windsurf\rules.md" "$ProjectDir\.windsurf\rules.md" -Force -ErrorAction SilentlyContinue
-Write-Green "Windsurf"
-$Summary += "✓ Windsurf"
-
-# --- Gemini CLI ---
-if (Has-Command gemini) {
-  Copy-Item "$ApexDir\gemini-extension.json" "$ProjectDir\gemini-extension.json" -Force -ErrorAction SilentlyContinue
-  Write-Green "Gemini CLI"
-  $Summary += "✓ Gemini CLI"
-} else {
-  Write-Dim "Gemini CLI: not detected"
+if ($detectedAgents.Count -eq 0) {
+  Write-Host "  No coding agents detected on this system." -ForegroundColor Yellow
+  Write-Host "  Install an agent first, then run this installer again." -ForegroundColor Yellow
+  Write-Host ""
+  Write-Host "  Supported agents: claude-code, codex, cursor, windsurf, cline," -ForegroundColor Gray
+  Write-Host "  copilot, gemini-cli, devin, hermes, kiro, swival, openclaw," -ForegroundColor Gray
+  Write-Host "  pi-agent, antigravity, codewhale" -ForegroundColor Gray
+  exit 1
 }
 
-# --- Skills ---
-if (Test-Path "$ApexDir\skills") {
-  $null = New-Item -ItemType Directory -Path "$ProjectDir\.claude\skills" -Force
-  Copy-Item "$ApexDir\skills\*" "$ProjectDir\.claude\skills\" -Recurse -Force
-  Write-Green "Skills (24 skills)"
-  $Summary += "✓ Skills"
+Write-Host "  Detected agents: $($detectedAgents -join ', ')" -ForegroundColor Green
+Write-Host ""
+
+if ($DryRun) {
+  Write-Host "  [DRY RUN] Would install for:" -ForegroundColor Cyan
+  foreach ($agent in $detectedAgents) {
+    Write-Host "    - $agent" -ForegroundColor Cyan
+  }
+  Write-Host "  [DRY RUN] No files changed." -ForegroundColor Cyan
+  exit 0
 }
 
-# --- Summary ---
-Write-Bold "`n  === Summary ==="
-foreach ($item in $Summary) { Write-Host "  $item" }
+# Universal MCP config is already in place
+Write-Host "  Using universal MCP config: .mcp.json" -ForegroundColor Gray
 
-Write-Bold "`n  === Quick Start ==="
-Write-Host @"
-  @arch refactor this         → Max compresses code
-  @ui build a login form      → Zara paints WCAG AA form
-  @debug fix this error       → Kai 5-step debug
-  @perf this is slow          → Rex profiles & optimizes
-  @sec review auth code       → Vex OWASP scans
-  @infra dockerize this       → Io outputs production config
-  @nova any ideas             → Nova proposes novel angles
-  @reed best caching          → Dr. Reed compares options
-  @review check this code     → Rila blocks/suggests/praises
-  @flex what's the MVP?       → Flex scores & cuts scope
-"@
+# Install for each detected agent
+foreach ($agent in $detectedAgents) {
+  Install-ForAgent -Agent $agent
+}
 
-Write-Bold "  === Marketplace Installs ==="
-Write-Host @"
-  Claude Code:  /plugin marketplace add asno-dev/apex
-  Codex:        codex plugin marketplace add asno-dev/apex
-  Gemini CLI:   gemini extensions install https://github.com/asno-dev/apex
-  OpenCode:     add "@asno-dev/apex" to opencode.json plugins
-"@
+Write-Host ""
+Write-Host "  ╔══════════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "  ║  ✓ APEX v2 installed for $($detectedAgents.Count) agent(s)!         ║" -ForegroundColor Cyan
+Write-Host "  ║                                               ║" -ForegroundColor Cyan
+Write-Host "  ║  Use @agentName to invoke any specialist:     ║" -ForegroundColor Cyan
+Write-Host "  ║  @arch  @ui  @debug  @perf  @sec  @infra      ║" -ForegroundColor Cyan
+Write-Host "  ║  @nova  @reed  @review  @flex                 ║" -ForegroundColor Cyan
+Write-Host "  ║                                               ║" -ForegroundColor Cyan
+Write-Host "  ║  apex-docs  apex-excel  apex-ppt — OfficeCLI      ║" -ForegroundColor Cyan
+Write-Host "  ║  apex-composio-setup    — Connect 1000+ tools    ║" -ForegroundColor Cyan
+Write-Host "  ║  apex-mirage <cmd>      — VFS across 50+ backends║" -ForegroundColor Cyan
+Write-Host "  ╚══════════════════════════════════════════════════╝" -ForegroundColor Cyan

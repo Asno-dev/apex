@@ -1,6 +1,6 @@
 name: apex
 version: 2.0.0
-description: APEX v2 — 10-agent senior engineering team. Routes requests to specialists.
+description: APEX v2 — 10-agent senior engineering team. Routes requests to specialists: @arch architecture, @ui UI, @debug debugging, @perf performance, @sec security, @infra infra, @nova creative, @reed research, @review PR review, @flex MVP scoping.
 author: asno-dev
 provides_skills:
   - apex
@@ -17,3 +17,104 @@ provides_skills:
 provides_commands:
   - apex
   - apex-help
+  - docs
+  - excel
+  - ppt
+  - composio-setup
+  - composio-status
+  - composio-sync
+  - mirage
+mcp_servers:
+  apex-hands:
+    type: local
+    command: ["node", "src/hands-server.mjs"]
+  mirage-vfs:
+    type: local
+    command: ["node", "src/mirage-server.mjs"]
+  apex-composio:
+    type: local
+    command: ["node", "src/composio-server.mjs"]
+agents:
+  - path: agents/arch/AGENT.md
+    tag: "@arch"
+    name: Max
+    role: Architect
+  - path: agents/ui/AGENT.md
+    tag: "@ui"
+    name: Zara
+    role: UI/UX Designer
+  - path: agents/debug/AGENT.md
+    tag: "@debug"
+    name: Kai
+    role: Debugger
+  - path: agents/perf/AGENT.md
+    tag: "@perf"
+    name: Rex
+    role: Performance Engineer
+  - path: agents/sec/AGENT.md
+    tag: "@sec"
+    name: Vex
+    role: Security Engineer
+  - path: agents/infra/AGENT.md
+    tag: "@infra"
+    name: Io
+    role: Infrastructure Engineer
+  - path: agents/nova/AGENT.md
+    tag: "@nova"
+    name: Nova
+    role: Creative Technologist
+  - path: agents/reed/AGENT.md
+    tag: "@reed"
+    name: Dr. Reed
+    role: Researcher
+  - path: agents/review/AGENT.md
+    tag: "@review"
+    name: Rila
+    role: Reviewer
+  - path: agents/flex/AGENT.md
+    tag: "@flex"
+    name: Flex
+    role: Founder/Product Strategist
+modes:
+  direct: "@agent = main agent with full authority"
+  team: "Orchestrator routes to one agent, calls peers dynamically (default)"
+  select: "/apex select a,b — only those active until changed"
+commands:
+  apex:
+    description: "APEX control — help, team, select, off, status"
+    usage: "/apex [team|select a,b|off|status|help]"
+  apex-help:
+    description: "Show APEX help"
+    usage: "/apex help"
+  apex-docs:
+    description: "Create/edit Word documents via OfficeCLI"
+    usage: "apex-docs"
+  apex-excel:
+    description: "Create/edit Excel spreadsheets via OfficeCLI"
+    usage: "apex-excel"
+  apex-ppt:
+    description: "Create PowerPoint presentations via OfficeCLI"
+    usage: "apex-ppt"
+  apex-composio-setup:
+    description: "Connect external tools via Composio (Gmail, GitHub, Slack, etc.)"
+    usage: "apex-composio-setup [--api-key KEY --tool SLUG]"
+  apex-composio-status:
+    description: "Show connected Composio tools and API key status"
+    usage: "apex-composio-status"
+  apex-composio-sync:
+    description: "Force sync connected tools from Composio backend"
+    usage: "apex-composio-sync"
+  apex-mirage:
+    description: "Mirage VFS — execute commands across mounted virtual filesystem backends"
+    usage: "apex-mirage <bash command>"
+external_tools:
+  composio:
+    description: "1000+ external tools — Gmail, GitHub, Slack, Jira, Notion, etc."
+    setup: "apex-composio-setup"
+    usage: "@toolName (e.g. @gmail, @github, @slack)"
+  mirage_vfs:
+    description: "Virtual filesystem across 50+ backends"
+    usage: "apex-mirage <bash command>"
+  officecli:
+    description: "Microsoft Office document creation (Word, Excel, PowerPoint)"
+    usage: "apex-docs, apex-excel, apex-ppt"
