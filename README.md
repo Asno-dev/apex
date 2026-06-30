@@ -720,3 +720,8 @@ If APEX helps your workflow, give it a ⭐ on [GitHub](https://github.com/asno-d
 <p align="center">
   Built with ⚡ by <a href="https://github.com/asno-dev">asno-dev</a>
 </p>
+
+<p align="center">
+  <a href="https://x.com/LKanth9406">Follow on X</a> •
+  <a href="https://www.reddit.com/u/AdhesivenessTight914/s/Nxr1nHJM1b">Follow on Reddit</a>
+</p>
