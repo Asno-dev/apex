@@ -91,7 +91,7 @@ Copy `AGENTS.md` to your project root. CodeWhale reads it automatically.
 ```bash
 npx @asno-dev/apex
 ```
-Auto-detects your installed agents and copies the right files.
+No auto-detection. No interactive picker. Specify your agent: `npx @asno-dev/apex cursor`
 
 ---
 
