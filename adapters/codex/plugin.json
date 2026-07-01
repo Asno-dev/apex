@@ -30,14 +30,14 @@
     "agents/flex.toml"
   ],
   "commands": [
-    "apex",
-    "apex-docs",
-    "apex-excel",
-    "apex-ppt",
-    "apex-composio-setup",
-    "apex-composio-status",
-    "apex-composio-sync",
-    "apex-mirage"
+    "commands/apex.md",
+    "commands/apex-docs.md",
+    "commands/apex-excel.md",
+    "commands/apex-ppt.md",
+    "commands/apex-composio-setup.md",
+    "commands/apex-composio-status.md",
+    "commands/apex-composio-sync.md",
+    "commands/apex-mirage.md"
   ],
   "features": {
     "subagents": true,
