@@ -215,13 +215,12 @@ npx @asno-dev/apex gemini
 ```
 
 <details>
-<summary><strong>.gemini/gemini-extension.json</strong> — 10 agents, 8 commands, 3 MCP servers, AGENTS.md</summary>
+<summary><strong>.gemini/gemini-extension.json</strong> — 10 agents, 8 commands, 3 MCP servers</summary>
 
 ```json
 {
   "name": "apex",
   "version": "2.0.0",
-  "contextFileName": "AGENTS.md",
   "mcpServers": {
     "apex-hands": { "command": "node apex/src/hands-server.mjs", "type": "local" },
     "mirage-vfs": { "command": "node apex/src/mirage-server.mjs", "type": "local" },
@@ -240,20 +239,20 @@ npx @asno-dev/apex gemini
     {"name": "flex", "file": "agents/flex.md", "tag": "@flex"}
   ],
   "commands": [
-    {"name": "apex", "file": "commands/apex.toml"},
-    {"name": "apex-docs", "file": "commands/apex-docs.toml"},
-    {"name": "apex-excel", "file": "commands/apex-excel.toml"},
-    {"name": "apex-ppt", "file": "commands/apex-ppt.toml"},
-    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.toml"},
-    {"name": "apex-composio-status", "file": "commands/apex-composio-status.toml"},
-    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.toml"},
-    {"name": "apex-mirage", "file": "commands/apex-mirage.toml"}
+    {"name": "apex", "file": "commands/apex.md"},
+    {"name": "apex-docs", "file": "commands/apex-docs.md"},
+    {"name": "apex-excel", "file": "commands/apex-excel.md"},
+    {"name": "apex-ppt", "file": "commands/apex-ppt.md"},
+    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.md"},
+    {"name": "apex-composio-status", "file": "commands/apex-composio-status.md"},
+    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.md"},
+    {"name": "apex-mirage", "file": "commands/apex-mirage.md"}
   ]
 }
 ```
 </details>
 
-**Installs:** `.gemini/gemini-extension.json`, `.gemini/agents/` (10 `.md`), `.gemini/commands/` (8 `.md`), `AGENTS.md`
+**Installs:** `.gemini/gemini-extension.json`, `.gemini/agents/` (10 `.md`), `.gemini/commands/` (8 `.md`)
 
 **Then:** `gemini extensions install .gemini` (installs from `.gemini/gemini-extension.json`)
 
@@ -611,6 +610,7 @@ npx @asno-dev/apex kilocode
 | `node apex/src/composio-status.mjs` | Show connected tools and API key status |
 | `node apex/src/composio-status.mjs --sync` | Force sync from Composio backend |
 | `apex-mirage <command>` | Execute commands across mounted virtual filesystem backends |
+| `/apex-team` | Full team mode — all 10 agents work together end-to-end |
 | `/apex team\|select\|off\|status\|help` | APEX mode control |
 
 ---

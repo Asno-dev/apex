@@ -11,6 +11,7 @@ APEX v2 — Senior Engineering Team. 10 agents.
 - `/apex off` — Disable APEX.
 - `/apex status` — Show current mode + active agents.
 - `/apex help` — Show detailed help.
+- /apex-team — Full team mode. All 10 agents work together end-to-end.
 
 ## Agents (use @agentName)
 | Tag | Name | Role |

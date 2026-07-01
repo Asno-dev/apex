@@ -12,6 +12,8 @@ description: "APEX v2 — 10-agent Senior Engineering Team control. Mode switchi
 - `/apex select a,b,c` — Select mode, only listed agents
 - `/apex off` — Disable APEX
 - `/apex status` — Show mode + active agents
+- `/apex help` — Show help guide.
+- /apex-team — Full team mode. All 10 agents work together end-to-end.
 
 ## Agents
 @arch Max (Architect) | @ui Zara (UI/UX) | @debug Kai (Debugger)

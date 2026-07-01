@@ -8,6 +8,7 @@ description: "APEX v2 control — mode switching, agent activation, help"
 - `/apex off` — Disable APEX.
 - `/apex status` — Show mode + active agents.
 - `/apex help` — Show help guide.
+- /apex-team — Full team mode. All 10 agents work together end-to-end.
 
 ## Agents
 @arch Max | @ui Zara | @debug Kai | @perf Rex | @sec Vex

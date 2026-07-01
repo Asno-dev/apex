@@ -66,11 +66,14 @@ const installers = {
     return true;
   },
   'codex': () => {
-    const d = path.join(CWD, '.codex'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents'));
+    const d = path.join(CWD, '.codex'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'plugins')); mkdir(path.join(d, 'commands'));
     copyFixed(path.join(ROOT, 'adapters/codex/plugin.json'), path.join(d, 'plugin.json'));
+    copyFixed(path.join(ROOT, 'adapters/codex/plugins/apex.json'), path.join(d, 'plugins/apex.json'));
+    copyFixed(path.join(ROOT, 'adapters/codex/plugins.json'), path.join(d, 'plugins.json'));
     copyFixed(path.join(ROOT, 'adapters/codex/mcp.toml'), path.join(d, 'mcp.toml'));
     copy(path.join(ROOT, 'adapters/codex/SKILLS.md'), path.join(d, 'SKILLS.md'));
     copyDir(path.join(ROOT, 'adapters/codex/agents'), path.join(d, 'agents'));
+    copyDir(path.join(ROOT, 'adapters/codex/commands'), path.join(d, 'commands'));
     return true;
   },
   'opencode': () => {

@@ -1,0 +1,43 @@
+{
+  "name": "apex",
+  "version": "3.0.0",
+  "description": "APEX v2 — 10-agent senior engineering team. Routes requests to specialists: @arch architecture, @ui UI, @debug debugging, @perf performance, @sec security, @infra infra, @nova creative, @reed research, @review PR review, @flex MVP scoping.",
+  "author": "asno-dev",
+  "mcpServers": {
+    "apex-hands": {
+      "type": "local",
+      "command": ["node", "apex/src/hands-server.mjs"]
+    },
+    "mirage-vfs": {
+      "type": "local",
+      "command": ["node", "apex/src/mirage-server.mjs"]
+    },
+    "apex-composio": {
+      "type": "local",
+      "command": ["node", "apex/src/composio-server.mjs"]
+    }
+  },
+  "subagents": [
+    "agents/arch.toml",
+    "agents/ui.toml",
+    "agents/debug.toml",
+    "agents/perf.toml",
+    "agents/sec.toml",
+    "agents/infra.toml",
+    "agents/nova.toml",
+    "agents/reed.toml",
+    "agents/review.toml",
+    "agents/flex.toml"
+  ],
+  "commands": [
+    "apex",
+    "apex-team",
+    "apex-docs",
+    "apex-excel",
+    "apex-ppt",
+    "apex-composio-setup",
+    "apex-composio-status",
+    "apex-composio-sync",
+    "apex-mirage"
+  ]
+}

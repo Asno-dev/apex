@@ -31,6 +31,7 @@ deploy/CI→@infra | ideas→@nova | research→@reed | review→@review | scope
 full-app→@arch→@ui→@infra | patch→@debug→@review
 
 ## Commands
+- `/apex-team` — Full team mode. All 10 agents work together end-to-end.
 - `/apex team` — Team mode (default). Routes to best agent, agents call peers.
 - `/apex select a,b` — Select mode. Only listed agents active.
 - `/apex off` — Disable APEX.

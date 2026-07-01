@@ -16,6 +16,7 @@ Controls the APEX orchestrator modes and displays status.
 | `apex off` | Disable APEX |
 | `apex status` | Show current mode and active agents |
 | `apex help` | Show this help |
+- /apex-team — Full team mode. All 10 agents work together end-to-end.
 
 ## Modes
 

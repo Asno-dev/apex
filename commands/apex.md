@@ -6,6 +6,7 @@ APEX v2 — Senior Engineering Team. 10 agents.
 
 ## Commands
 - `/apex` — Show help
+- `/apex-team` — Full team mode. Enable all 10 agents working together end-to-end.
 - `/apex team` — Team mode (default). Dynamic peer calling.
 - `/apex select a,b,c` — Select mode. Only listed agents active.
 - `/apex off` — Disable APEX.

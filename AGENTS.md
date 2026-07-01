@@ -77,6 +77,7 @@ Gmail, GitHub, Slack, Google Drive, Jira, Linear, Notion, and more.
 
 | Command | Description |
 |:--------|:------------|
+| `/apex-team` | Full team mode — all 10 agents work together end-to-end |
 | `/apex team` | Team mode (default) — auto-routing + dynamic peers |
 | `/apex select a,b,c` | Select mode — only listed agents active |
 | `/apex off` | Disable APEX |
