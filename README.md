@@ -202,9 +202,9 @@ npx @asno-dev/apex codex
 ```
 </details>
 
-**Installs:** `.codex/plugin.json`, `.codex/mcp.toml`, `.codex/agents/` (10 `.toml`), `.codex/SKILLS.md`
+**Installs:** `.codex/plugin.json`, `.codex/mcp.toml`, `.codex/agents/` (10 `.toml`), `.codex/SKILLS.md`, `commands/apex.md`
 
-**Codex auto-loads** `.codex/plugin.json` on startup. If not, run: `codex plugin add apex`
+**Codex auto-loads** `.codex/plugin.json` on startup. Zero setup.
 
 ---
 
@@ -215,7 +215,7 @@ npx @asno-dev/apex gemini
 ```
 
 <details>
-<summary><strong>.gemini/extension.json</strong> — 10 agents, 8 commands, 3 MCP servers, AGENTS.md</summary>
+<summary><strong>.gemini/gemini-extension.json</strong> — 10 agents, 8 commands, 3 MCP servers, AGENTS.md</summary>
 
 ```json
 {
@@ -253,9 +253,9 @@ npx @asno-dev/apex gemini
 ```
 </details>
 
-**Installs:** `.gemini/extension.json`, `.gemini/agents/` (10 `.md`), `.gemini/commands/` (8 `.toml`), `AGENTS.md`
+**Installs:** `.gemini/gemini-extension.json`, `.gemini/agents/` (10 `.md`), `.gemini/commands/` (8 `.md`), `AGENTS.md`
 
-**Gemini auto-detects** `.gemini/extension.json` on startup. If not, run: `gemini extensions install .gemini`
+**Then:** `gemini extensions install .gemini` (installs from `.gemini/gemini-extension.json`)
 
 ---
 
@@ -596,7 +596,7 @@ npx @asno-dev/apex kilocode
 
 **Installs:** `.kilo/mcp.json`, `.kilo/steering/apex.md`, `.kilo/agents/` (10 `.md`), `.kilo/commands/` (8 `.md`)
 
-**Auto-detects** — KiloCode loads `.kilo/` config on project open. Zero setup.
+**Auto-detects** — KiloCode (`kilo` binary) loads `.kilo/` config on project open. Zero setup.
 
 ---
 

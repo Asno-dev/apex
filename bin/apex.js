@@ -59,7 +59,7 @@ const installers = {
   },
   'gemini': () => {
     const d = path.join(CWD, '.gemini'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
-    copyFixed(path.join(ROOT, 'adapters/gemini/extension.json'), path.join(d, 'extension.json'));
+    copyFixed(path.join(ROOT, 'adapters/gemini/gemini-extension.json'), path.join(d, 'gemini-extension.json'));
     copy(path.join(ROOT, 'AGENTS.md'), path.join(d, 'AGENTS.md'));
     copyDir(path.join(ROOT, 'adapters/gemini/agents'), path.join(d, 'agents'));
     copyDir(path.join(ROOT, 'adapters/gemini/commands'), path.join(d, 'commands'));
