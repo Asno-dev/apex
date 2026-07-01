@@ -68,9 +68,9 @@ apex-docs                          → Create Word/Excel/PPT documents
 apex-excel
 apex-ppt
 
-node src/composio-setup.mjs       → Connect 1000+ external tools (Gmail, GitHub, Slack, etc.)
-node src/composio-status.mjs      → Show connected tools status
-node src/composio-status.mjs --sync → Force sync from Composio backend
+node apex/src/composio-setup.mjs       → Connect 1000+ external tools (Gmail, GitHub, Slack, etc.)
+node apex/src/composio-status.mjs      → Show connected tools status
+node apex/src/composio-status.mjs --sync → Force sync from Composio backend
 
 apex-mirage ls /s3/                → Virtual filesystem across 50+ backends
 
@@ -172,53 +172,64 @@ APEX supports **16+ coding agents** with dedicated adapters for each.
 ### Quick Install (Recommended)
 
 ```bash
-# Run interactive installer — detects your agents, lets you pick
 npx @asno-dev/apex
-
-# Or install globally first
-npm install -g @asno-dev/apex
 ```
 
-The installer will:
-1. **Auto-detect** all coding agents installed on your system
-2. **Show an interactive picker** — use ↑↓ to navigate, Space to toggle, Enter to confirm
-3. **Install** the correct config files for each selected agent (agents, commands, MCP servers, rules)
-4. **Zero manual setup** — everything is configured automatically
+The installer:
+1. **Detects** your installed coding agents automatically
+2. **Shows picker** — ↑↓ navigate, **Space** toggle, **Enter** confirm
+3. **Installs** all APEX files into `apex/` + agent configs at project root
+4. **Fixes MCP paths** so `@arch`, `@ui`, `@debug` etc. work out of the box
 
 ### Options
 
 ```bash
-npx @asno-dev/apex              # Interactive mode (default)
+npx @asno-dev/apex              # Interactive picker (default)
 npx @asno-dev/apex --yes        # Auto-install for all detected agents
-npx @asno-dev/apex --all        # Install for ALL 16 agents (even undetected ones)
 ```
 
-### Supported Agents
+### Per-Agent Installation Details
 
-| Agent | What Gets Installed |
-|:------|:-------------------|
-| **Claude Code** | `.claude/plugin.json` + agents + commands + skills |
-| **Cursor** | `.cursor/mcp.json` + rules + agents + commands |
-| **Windsurf** | `.windsurf/mcp.json` + rules + agents + workflows |
-| **Cline / Kilo** | `.clinerules` (project root) |
-| **GitHub Copilot** | `.github/copilot-instructions.md` |
-| **Gemini CLI** | `.gemini/extension.json` + agents + commands |
-| **Codex CLI** | `.codex/plugin.json` + agents + mcp.toml |
-| **Devin** | `.devin/plugin.yaml` + agents + mcp.json |
-| **Hermes** | `.hermes/plugin.yaml` + features |
-| **OpenCode** | `opencode.json` + plugin |
-| **Kiro** | `.kiro/steering/apex.md` |
-| **Pi Agent** | `pi-extension.json` |
-| **Antigravity** | `antigravity-extension.json` |
-| **OpenClaw** | `openclaw-package.json` |
-| **CodeWhale** | `AGENTS.md` |
-| **Swival** | `swival-apex-skill.md` + `.swival/mcp.json` |
+| Agent | What Gets Installed | How to Use APEX |
+|:------|:--------------------|:----------------|
+| **Claude Code** | `.claude/plugin.json` + `.claude/agents/*.md` + `.claude/commands/*.md` | `@arch` works natively via subagents |
+| **Codex CLI** | `.codex/plugin.json` + `.codex/mcp.toml` + `.codex/agents/*.toml` | `@arch` works natively via subagents |
+| **Gemini CLI** | `.gemini/extension.json` + `.gemini/agents/*.md` + `.gemini/commands/*.toml` | `@arch` works natively via extension agents |
+| **OpenCode** | `opencode.json` + `adapters/opencode/apex.mjs` + `.opencode/agents/*.md` | `@arch` works natively via agents |
+| **Cursor** | `.cursor/mcp.json` + `.cursor/rules/apex.mdc` | MCP servers + rule-based routing |
+| **Windsurf** | `.windsurf/mcp.json` + `.windsurf/rules/apex.md` + `.windsurf/workflows/` | MCP servers + rule-based routing |
+| **Antigravity** | `antigravity-extension.json` + `AGENTS.md` | Extension with MCP servers |
+| **Cline / Kilo** | `.clinerules` (project root) | Instructions loaded as system prompt |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Copilot instructions |
+| **Devin** | `.devin/plugin.yaml` + `.devin/mcp.json` + `.devin/agents/*/AGENT.md` | Plugin with MCP + agent files |
+| **Hermes** | `.hermes/plugin.yaml` + `hermes-apex.yaml` | Plugin with skills |
+| **Pi Agent** | `pi-extension.json` + `AGENTS.md` | Extension with MCP servers |
+| **Kiro** | `.kiro/steering/apex.md` | Steering prompt |
+| **OpenClaw** | `openclaw-package.json` + `openclaw-apex.md` | Package config + skill |
+| **CodeWhale** | `AGENTS.md` | Agent instructions |
+| **Swival** | `swival-apex-skill.md` + `.swival/mcp.json` | Skill file + MCP servers |
 
-### What Gets Installed (Universal)
+### Universal Files (Installed for Every Agent)
 
-- `AGENTS.md` — Agent instructions (every agent reads this)
-- `.mcp.json` — 3 MCP servers (apex-hands, mirage-vfs, apex-composio)
-- `skills/` — 25 specialized skill files
+| File | Location | Purpose |
+|:-----|:---------|:--------|
+| `apex/` | Project root (`./apex/`) | All APEX source files — MCP servers, skills, agents, commands |
+| `apex/src/` | `./apex/src/` | MCP server implementations (hands-server, mirage-server, composio-server) |
+| `apex/skills/` | `./apex/skills/` | 25 skill files for all 10 agents |
+| `apex/AGENTS.md` | `./apex/AGENTS.md` | 10-agent team documentation |
+| `.mcp.json` | Project root | 3 MCP servers with paths fixed to `apex/src/` |
+| `AGENTS.md` | Project root | Agent instructions (aggressive caching) |
+
+### Verify Installation
+
+After installing, verify APEX is loaded:
+
+- **Claude Code**: Run `claude` — type `@arch` and see Max respond
+- **Codex CLI**: Run `codex` — type `@arch` and see Max respond
+- **Gemini CLI**: Run `gemini` — type `@arch` and see Max respond  
+- **OpenCode**: Run `opencode` — type `@arch` and see Max respond
+- **Cursor**: Open project — rules and MCP servers are active
+- **Windsurf**: Open project — rules and MCP servers are active
 
 ---
 
@@ -231,9 +242,9 @@ All APEX commands use the `apex-` prefix for clean namespacing — no collisions
 | `apex-docs` | Create/edit Word documents via OfficeCLI |
 | `apex-excel` | Create/edit Excel spreadsheets via OfficeCLI |
 | `apex-ppt` | Create PowerPoint presentations via OfficeCLI |
-| `node src/composio-setup.mjs` | Connect external tools — paste API key, get OAuth link |
-| `node src/composio-status.mjs` | Show connected tools and API key status |
-| `node src/composio-status.mjs --sync` | Force sync from Composio backend |
+| `node apex/src/composio-setup.mjs` | Connect external tools — paste API key, get OAuth link |
+| `node apex/src/composio-status.mjs` | Show connected tools and API key status |
+| `node apex/src/composio-status.mjs --sync` | Force sync from Composio backend |
 | `apex-mirage <command>` | Execute commands across mounted virtual filesystem backends |
 | `/apex team\|select\|off\|status\|help` | APEX mode control |
 
@@ -310,7 +321,7 @@ The primary MCP server. 56 tools organized by agent domain:
   "mcpServers": {
     "apex-hands": {
       "type": "local",
-      "command": ["node", "src/hands-server.mjs"]
+      "command": ["node", "apex/src/hands-server.mjs"]
     }
   }
 }
@@ -326,7 +337,7 @@ Unified filesystem across S3, GDrive, Slack, Redis, Postgres, and more.
   "mcpServers": {
     "mirage-vfs": {
       "type": "local",
-      "command": ["node", "src/mirage-server.mjs"]
+      "command": ["node", "apex/src/mirage-server.mjs"]
     }
   }
 }
@@ -352,7 +363,7 @@ Bridges Gmail, GitHub, Slack, Jira, Notion, and 1000+ more tools.
   "mcpServers": {
     "apex-composio": {
       "type": "local",
-      "command": ["node", "src/composio-server.mjs"]
+      "command": ["node", "apex/src/composio-server.mjs"]
     }
   }
 }
@@ -364,9 +375,9 @@ The root `.mcp.json` includes all three servers:
 ```json
 {
   "mcpServers": {
-    "apex-hands": { "command": ["node", "src/hands-server.mjs"] },
-    "mirage-vfs": { "command": ["node", "src/mirage-server.mjs"] },
-    "apex-composio": { "command": ["node", "src/composio-server.mjs"] }
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"] },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"] },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"] }
   }
 }
 ```
@@ -381,7 +392,7 @@ Connect **1000+ external tools** (Gmail, GitHub, Slack, Google Drive, Jira, Line
 
 ```bash
 # Interactive setup wizard
-node src/composio-setup.mjs
+node apex/src/composio-setup.mjs
 ```
 
 The wizard will:
@@ -393,8 +404,8 @@ The wizard will:
 ### Status & Sync
 
 ```bash
-node src/composio-status.mjs          # Show all connected tools and their status
-node src/composio-status.mjs --sync   # Force refresh tool definitions from backend
+node apex/src/composio-status.mjs          # Show all connected tools and their status
+node apex/src/composio-status.mjs --sync   # Force refresh tool definitions from backend
 ```
 
 ### Usage

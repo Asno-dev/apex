@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // APEX v2 — Interactive Installer
 // Usage: npx @asno-dev/apex
-// Shows all 16 agents, interactive picker, installs to apex/ folder.
+// Shows all 16 agents, interactive picker, installs to project root.
+// All MCP server paths are fixed: src/ → apex/src/ in config files
 
 const fs = require('fs');
 const path = require('path');
@@ -11,8 +12,9 @@ const readline = require('readline');
 const APEX_DIR = path.resolve(__dirname, '..');
 const HOME = process.env.HOME || process.env.USERPROFILE;
 const CWD = process.cwd();
+const APEX = path.join(CWD, 'apex');
 
-// ─── Helpers ────────────────────────────────────────────────
+// ─── Terminal Colors ────────────────────────────────────────
 const c = {
   reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m',
   red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m',
@@ -21,6 +23,7 @@ const c = {
 function log(color, msg) { process.stdout.write(`${color}${msg}${c.reset}\n`); }
 function ok(msg) { log(c.green, `  ✓ ${msg}`); }
 function warn(msg) { log(c.yellow, `  ⚠ ${msg}`); }
+function info(msg) { log(c.dim, `  ${msg}`); }
 function err(msg) { log(c.red, `  ✗ ${msg}`); }
 
 function mkdir(dir) { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); }
@@ -28,16 +31,79 @@ function copy(src, dest) {
   try { if (!fs.existsSync(src)) return false; mkdir(path.dirname(dest)); fs.copyFileSync(src, dest); return true; }
   catch { return false; }
 }
-function copyDir(src, dest) {
+function copyDir(src, dest, skipNodeModules = true) {
   try {
     if (!fs.existsSync(src)) return false; mkdir(dest);
     for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+      if (skipNodeModules && e.name === 'node_modules') continue;
       const s = path.join(src, e.name), d = path.join(dest, e.name);
-      e.isDirectory() ? copyDir(s, d) : copy(s, d);
+      e.isDirectory() ? copyDir(s, d, skipNodeModules) : copy(s, d);
     }
     return true;
   } catch { return false; }
 }
+
+function readFile(p) { try { return fs.readFileSync(p, 'utf-8'); } catch { return null; } }
+function writeFile(p, content) { mkdir(path.dirname(p)); fs.writeFileSync(p, content, 'utf-8'); }
+
+// Find a source file with fallback paths. Returns the first that exists.
+function resolveSource(...candidates) {
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+// ─── Path Fixing ────────────────────────────────────────────
+// All MCP server paths in config files must be fixed from
+//   src/...  →  apex/src/...
+// because configs go to project root but servers live in apex/src/
+function fixMcpPaths(content) {
+  if (!content) return content;
+  let r = content;
+  // 1. JSON / YAML quoted string paths (handles arrays and values)
+  r = r.replace(/"src\/hands-server\.mjs"/g, '"apex/src/hands-server.mjs"');
+  r = r.replace(/"src\/mirage-server\.mjs"/g, '"apex/src/mirage-server.mjs"');
+  r = r.replace(/"src\/composio-server\.mjs"/g, '"apex/src/composio-server.mjs"');
+  // 2. TOML args format
+  r = r.replace(/args = \["src\/hands-server\.mjs"\]/g, 'args = ["apex/src/hands-server.mjs"]');
+  r = r.replace(/args = \["src\/mirage-server\.mjs"\]/g, 'args = ["apex/src/mirage-server.mjs"]');
+  r = r.replace(/args = \["src\/composio-server\.mjs"\]/g, 'args = ["apex/src/composio-server.mjs"]');
+  // 3. Gemini-style string commands: "command": "node src/..."
+  r = r.replace(/"command": "node src\/hands-server\.mjs"/g, '"command": "node apex/src/hands-server.mjs"');
+  r = r.replace(/"command": "node src\/mirage-server\.mjs"/g, '"command": "node apex/src/mirage-server.mjs"');
+  r = r.replace(/"command": "node src\/composio-server\.mjs"/g, '"command": "node apex/src/composio-server.mjs"');
+  // 4. YAML command arrays: command: ["node", "src/..."]
+  r = r.replace(/command: \["node", "src\/hands-server\.mjs"\]/g, 'command: ["node", "apex/src/hands-server.mjs"]');
+  r = r.replace(/command: \["node", "src\/mirage-server\.mjs"\]/g, 'command: ["node", "apex/src/mirage-server.mjs"]');
+  r = r.replace(/command: \["node", "src\/composio-server\.mjs"\]/g, 'command: ["node", "apex/src/composio-server.mjs"]');
+  // 5. Hermes YAML hyphen-prefixed commands: - command: ["node", "src/..."]
+  r = r.replace(/- command: \["node", "src\/hands-server\.mjs"\]/g, '- command: ["node", "apex/src/hands-server.mjs"]');
+  r = r.replace(/- command: \["node", "src\/mirage-server\.mjs"\]/g, '- command: ["node", "apex/src/mirage-server.mjs"]');
+  r = r.replace(/- command: \["node", "src\/composio-server\.mjs"\]/g, '- command: ["node", "apex/src/composio-server.mjs"]');
+  return r;
+}
+
+// Copy a single file with path fixing applied
+function copyFixed(src, dest) {
+  const content = readFile(src);
+  if (!content) return false;
+  writeFile(dest, fixMcpPaths(content));
+  return true;
+}
+
+// Copy a directory tree, fixing paths in every file
+function copyDirFixed(src, dest) {
+  try {
+    if (!fs.existsSync(src)) return false; mkdir(dest);
+    for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+      const s = path.join(src, e.name), d = path.join(dest, e.name);
+      e.isDirectory() ? copyDir(s, d) : copyFixed(s, d);
+    }
+    return true;
+  } catch { return false; }
+}
+
 function hasCommand(cmd) {
   if (!cmd) return false;
   try { execSync(process.platform === 'win32' ? `where ${cmd}` : `which ${cmd}`, { stdio: 'ignore', timeout: 5000 }); return true; }
@@ -45,145 +111,196 @@ function hasCommand(cmd) {
 }
 function dirExists(p) { try { return fs.existsSync(p) && fs.statSync(p).isDirectory(); } catch { return false; } }
 
+// Resolve the best source for a shared file (check root first, then adapters)
+function resolveSharedFile(name) {
+  const rootPath = path.join(APEX_DIR, name);
+  if (fs.existsSync(rootPath)) return rootPath;
+  // If .mcp.json doesn't exist at root, use devin template
+  if (name === '.mcp.json') {
+    const fallback = path.join(APEX_DIR, 'adapters/devin/mcp.json');
+    if (fs.existsSync(fallback)) return fallback;
+  }
+  // If AGENTS.md doesn't exist at root, use codewhale template
+  if (name === 'AGENTS.md') {
+    const fallback = path.join(APEX_DIR, 'adapters/codewhale/AGENTS.md');
+    if (fs.existsSync(fallback)) return fallback;
+  }
+  return rootPath; // return original, will be handled by caller
+}
+
 // ─── All 16 Agents ─────────────────────────────────────────
+// install(root) copies configs to project root with MCP paths fixed
 const AGENTS = [
   { id: 'claude-code', name: 'Claude Code', icon: '🟣',
     detect: () => hasCommand('claude') || dirExists(path.join(HOME, '.claude')),
-    install: (dest) => {
-      mkdir(path.join(dest, '.claude', 'agents'));
-      mkdir(path.join(dest, '.claude', 'commands'));
-      copy(path.join(APEX_DIR, 'adapters/claude-code/plugin.json'), path.join(dest, '.claude/plugin.json'));
-      copy(path.join(APEX_DIR, 'adapters/claude-code/hooks.json'), path.join(dest, '.claude/hooks.json'));
-      copyDir(path.join(APEX_DIR, 'adapters/claude-code/agents'), path.join(dest, '.claude/agents'));
-      copyDir(path.join(APEX_DIR, 'adapters/claude-code/commands'), path.join(dest, '.claude/commands'));
+    install: (root) => {
+      mkdir(path.join(root, '.claude', 'agents'));
+      mkdir(path.join(root, '.claude', 'commands'));
+      copyFixed(path.join(APEX_DIR, 'adapters/claude-code/plugin.json'), path.join(root, '.claude/plugin.json'));
+      copy(path.join(APEX_DIR, 'adapters/claude-code/hooks.json'), path.join(root, '.claude/hooks.json'));
+      copyDir(path.join(APEX_DIR, 'adapters/claude-code/agents'), path.join(root, '.claude/agents'));
+      copyDir(path.join(APEX_DIR, 'adapters/claude-code/commands'), path.join(root, '.claude/commands'));
       return '.claude/ (plugin, agents, commands)';
     }
   },
   { id: 'cursor', name: 'Cursor', icon: '🔵',
     detect: () => hasCommand('cursor') || dirExists(path.join(HOME, '.cursor')),
-    install: (dest) => {
-      mkdir(path.join(dest, '.cursor', 'rules'));
-      mkdir(path.join(dest, '.cursor', 'agents'));
-      mkdir(path.join(dest, '.cursor', 'commands'));
-      copy(path.join(APEX_DIR, '.mcp.json'), path.join(dest, '.cursor/mcp.json'));
-      copy(path.join(APEX_DIR, 'adapters/cursor/rules/apex.mdc'), path.join(dest, '.cursor/rules/apex.mdc'));
-      copyDir(path.join(APEX_DIR, 'adapters/cursor/agents'), path.join(dest, '.cursor/agents'));
-      copyDir(path.join(APEX_DIR, 'adapters/cursor/commands'), path.join(dest, '.cursor/commands'));
+    install: (root) => {
+      mkdir(path.join(root, '.cursor', 'rules'));
+      mkdir(path.join(root, '.cursor', 'agents'));
+      mkdir(path.join(root, '.cursor', 'commands'));
+      copyFixed(resolveSharedFile('.mcp.json'), path.join(root, '.cursor/mcp.json'));
+      copy(path.join(APEX_DIR, 'adapters/cursor/rules/apex.mdc'), path.join(root, '.cursor/rules/apex.mdc'));
+      copyDir(path.join(APEX_DIR, 'adapters/cursor/agents'), path.join(root, '.cursor/agents'));
+      copyDir(path.join(APEX_DIR, 'adapters/cursor/commands'), path.join(root, '.cursor/commands'));
       return '.cursor/ (mcp, rules, agents, commands)';
     }
   },
   { id: 'windsurf', name: 'Windsurf', icon: '🟠',
     detect: () => hasCommand('windsurf') || dirExists(path.join(HOME, '.windsurf')),
-    install: (dest) => {
-      mkdir(path.join(dest, '.windsurf', 'rules'));
-      mkdir(path.join(dest, '.windsurf', 'agents'));
-      mkdir(path.join(dest, '.windsurf', 'workflows'));
-      copy(path.join(APEX_DIR, '.mcp.json'), path.join(dest, '.windsurf/mcp.json'));
-      copy(path.join(APEX_DIR, 'adapters/windsurf/rules/apex.md'), path.join(dest, '.windsurf/rules/apex.md'));
-      copyDir(path.join(APEX_DIR, 'adapters/windsurf/agents'), path.join(dest, '.windsurf/agents'));
-      copyDir(path.join(APEX_DIR, 'adapters/windsurf/workflows'), path.join(dest, '.windsurf/workflows'));
+    install: (root) => {
+      mkdir(path.join(root, '.windsurf', 'rules'));
+      mkdir(path.join(root, '.windsurf', 'agents'));
+      mkdir(path.join(root, '.windsurf', 'workflows'));
+      copyFixed(resolveSharedFile('.mcp.json'), path.join(root, '.windsurf/mcp.json'));
+      copy(path.join(APEX_DIR, 'adapters/windsurf/rules/apex.md'), path.join(root, '.windsurf/rules/apex.md'));
+      copyDir(path.join(APEX_DIR, 'adapters/windsurf/agents'), path.join(root, '.windsurf/agents'));
+      copyDir(path.join(APEX_DIR, 'adapters/windsurf/workflows'), path.join(root, '.windsurf/workflows'));
       return '.windsurf/ (mcp, rules, agents, workflows)';
     }
   },
   { id: 'cline', name: 'Cline / Kilo Code', icon: '🟢',
     detect: () => dirExists(path.join(HOME, '.cline')) || dirExists(path.join(HOME, '.kilo')),
-    install: (dest) => { copy(path.join(APEX_DIR, '.clinerules'), path.join(dest, '.clinerules')); return '.clinerules'; }
+    install: (root) => { copy(path.join(APEX_DIR, '.clinerules'), path.join(root, '.clinerules')); return '.clinerules'; }
   },
   { id: 'copilot', name: 'GitHub Copilot', icon: '⚪',
     detect: () => hasCommand('gh') || dirExists(path.join(HOME, '.github')),
-    install: (dest) => { mkdir(path.join(dest, '.github')); copy(path.join(APEX_DIR, 'adapters/copilot/instructions.md'), path.join(dest, '.github/copilot-instructions.md')); return '.github/copilot-instructions.md'; }
+    install: (root) => { mkdir(path.join(root, '.github')); copy(path.join(APEX_DIR, 'adapters/copilot/instructions.md'), path.join(root, '.github/copilot-instructions.md')); return '.github/copilot-instructions.md'; }
   },
   { id: 'gemini', name: 'Gemini CLI', icon: '🔴',
     detect: () => hasCommand('gemini') || dirExists(path.join(HOME, '.gemini')),
-    install: (dest) => {
-      mkdir(path.join(dest, '.gemini', 'agents'));
-      mkdir(path.join(dest, '.gemini', 'commands'));
-      copy(path.join(APEX_DIR, 'adapters/gemini/extension.json'), path.join(dest, '.gemini/extension.json'));
-      copy(path.join(APEX_DIR, 'AGENTS.md'), path.join(dest, '.gemini/AGENTS.md'));
-      copyDir(path.join(APEX_DIR, 'adapters/gemini/agents'), path.join(dest, '.gemini/agents'));
-      copyDir(path.join(APEX_DIR, 'adapters/gemini/commands'), path.join(dest, '.gemini/commands'));
+    install: (root) => {
+      mkdir(path.join(root, '.gemini', 'agents'));
+      mkdir(path.join(root, '.gemini', 'commands'));
+      copyFixed(path.join(APEX_DIR, 'adapters/gemini/extension.json'), path.join(root, '.gemini/extension.json'));
+      copy(resolveSharedFile('AGENTS.md'), path.join(root, '.gemini/AGENTS.md'));
+      copyDir(path.join(APEX_DIR, 'adapters/gemini/agents'), path.join(root, '.gemini/agents'));
+      copyDir(path.join(APEX_DIR, 'adapters/gemini/commands'), path.join(root, '.gemini/commands'));
       return '.gemini/ (extension, agents, commands)';
     }
   },
   { id: 'codex', name: 'Codex CLI', icon: '🟡',
     detect: () => hasCommand('codex') || dirExists(path.join(HOME, '.codex')),
-    install: (dest) => {
-      mkdir(path.join(dest, '.codex', 'agents'));
-      copy(path.join(APEX_DIR, 'adapters/codex/plugin.json'), path.join(dest, '.codex/plugin.json'));
-      copy(path.join(APEX_DIR, 'adapters/codex/mcp.toml'), path.join(dest, '.codex/mcp.toml'));
-      copy(path.join(APEX_DIR, 'adapters/codex/SKILLS.md'), path.join(dest, '.codex/SKILLS.md'));
-      copyDir(path.join(APEX_DIR, 'adapters/codex/agents'), path.join(dest, '.codex/agents'));
+    install: (root) => {
+      mkdir(path.join(root, '.codex', 'agents'));
+      copyFixed(path.join(APEX_DIR, 'adapters/codex/plugin.json'), path.join(root, '.codex/plugin.json'));
+      copyFixed(path.join(APEX_DIR, 'adapters/codex/mcp.toml'), path.join(root, '.codex/mcp.toml'));
+      copy(path.join(APEX_DIR, 'adapters/codex/SKILLS.md'), path.join(root, '.codex/SKILLS.md'));
+      copyDir(path.join(APEX_DIR, 'adapters/codex/agents'), path.join(root, '.codex/agents'));
       return '.codex/ (plugin, agents, mcp.toml)';
     }
   },
   { id: 'devin', name: 'Devin', icon: '🟤',
     detect: () => hasCommand('devin') || dirExists(path.join(HOME, '.devin')),
-    install: (dest) => {
-      mkdir(path.join(dest, '.devin', 'agents'));
-      copy(path.join(APEX_DIR, 'adapters/devin/plugin.yaml'), path.join(dest, '.devin/plugin.yaml'));
-      copy(path.join(APEX_DIR, 'adapters/devin/mcp.json'), path.join(dest, '.devin/mcp.json'));
+    install: (root) => {
+      mkdir(path.join(root, '.devin', 'agents'));
+      copyFixed(path.join(APEX_DIR, 'adapters/devin/plugin.yaml'), path.join(root, '.devin/plugin.yaml'));
+      copyFixed(path.join(APEX_DIR, 'adapters/devin/mcp.json'), path.join(root, '.devin/mcp.json'));
       for (const a of ['arch','ui','debug','perf','sec','infra','nova','reed','review','flex']) {
-        mkdir(path.join(dest, '.devin/agents', a));
+        mkdir(path.join(root, '.devin/agents', a));
         const src = path.join(APEX_DIR, `adapters/devin/agents/${a}/AGENT.md`);
-        if (fs.existsSync(src)) copy(src, path.join(dest, `.devin/agents/${a}/AGENT.md`));
+        if (fs.existsSync(src)) copy(src, path.join(root, `.devin/agents/${a}/AGENT.md`));
       }
       return '.devin/ (plugin, agents, mcp)';
     }
   },
   { id: 'hermes', name: 'Hermes', icon: '🩷',
     detect: () => hasCommand('hermes') || dirExists(path.join(HOME, '.hermes')),
-    install: (dest) => {
-      mkdir(path.join(dest, '.hermes'));
-      copy(path.join(APEX_DIR, 'adapters/hermes/plugin.yaml'), path.join(dest, '.hermes/plugin.yaml'));
-      copy(path.join(APEX_DIR, 'adapters/hermes/apex-features.yaml'), path.join(dest, 'hermes-apex.yaml'));
+    install: (root) => {
+      mkdir(path.join(root, '.hermes'));
+      copy(path.join(APEX_DIR, 'adapters/hermes/plugin.yaml'), path.join(root, '.hermes/plugin.yaml'));
+      copyFixed(path.join(APEX_DIR, 'adapters/hermes/apex-features.yaml'), path.join(root, 'hermes-apex.yaml'));
       return '.hermes/ + hermes-apex.yaml';
     }
   },
   { id: 'opencode', name: 'OpenCode', icon: '🔷',
     detect: () => hasCommand('opencode') || dirExists(path.join(HOME, '.opencode')),
-    install: (dest) => {
-      mkdir(path.join(dest, 'adapters/opencode'));
-      copy(path.join(APEX_DIR, 'opencode.json'), path.join(dest, 'opencode.json'));
-      copy(path.join(APEX_DIR, 'adapters/opencode/apex.mjs'), path.join(dest, 'adapters/opencode/apex.mjs'));
-      return 'opencode.json + adapters/opencode/apex.mjs';
+    install: (root) => {
+      mkdir(path.join(root, 'adapters/opencode'));
+      // Copy opencode.json (with MCP paths fixed)
+      copyFixed(path.join(APEX_DIR, 'opencode.json'), path.join(root, 'opencode.json'));
+      // Copy the OpenCode plugin file if it exists
+      const pluginSrc = path.join(APEX_DIR, 'adapters/opencode/apex.mjs');
+      if (fs.existsSync(pluginSrc)) {
+        copy(pluginSrc, path.join(root, 'adapters/opencode/apex.mjs'));
+      } else {
+        warn('adapters/opencode/apex.mjs not found — OpenCode agents will still work but plugin features limited');
+      }
+      // Copy .opencode/agents/ from the APEX install dir
+      if (dirExists(path.join(APEX_DIR, '.opencode/agents'))) {
+        copyDir(path.join(APEX_DIR, '.opencode/agents'), path.join(root, '.opencode/agents'));
+      }
+      return 'opencode.json + adapters/opencode/apex.mjs + .opencode/agents/';
     }
   },
   { id: 'kiro', name: 'Kiro', icon: '⬛',
     detect: () => dirExists(path.join(HOME, '.kiro')),
-    install: (dest) => { mkdir(path.join(dest, '.kiro/steering')); copy(path.join(APEX_DIR, 'adapters/kiro/apex.md'), path.join(dest, '.kiro/steering/apex.md')); return '.kiro/steering/apex.md'; }
+    install: (root) => { mkdir(path.join(root, '.kiro/steering')); copy(path.join(APEX_DIR, 'adapters/kiro/apex.md'), path.join(root, '.kiro/steering/apex.md')); return '.kiro/steering/apex.md'; }
   },
   { id: 'pi', name: 'Pi Agent', icon: '🟪',
     detect: () => hasCommand('pi') || dirExists(path.join(HOME, '.pi')),
-    install: (dest) => { copy(path.join(APEX_DIR, 'adapters/pi/extension.json'), path.join(dest, 'pi-extension.json')); copy(path.join(APEX_DIR, 'AGENTS.md'), path.join(dest, 'AGENTS.md')); return 'pi-extension.json + AGENTS.md'; }
+    install: (root) => {
+      copyFixed(path.join(APEX_DIR, 'adapters/pi/extension.json'), path.join(root, 'pi-extension.json'));
+      copy(resolveSharedFile('AGENTS.md'), path.join(root, 'AGENTS.md'));
+      return 'pi-extension.json + AGENTS.md';
+    }
   },
   { id: 'antigravity', name: 'Antigravity', icon: '✳️',
     detect: () => hasCommand('agy') || dirExists(path.join(HOME, '.antigravity')),
-    install: (dest) => { copy(path.join(APEX_DIR, 'adapters/antigravity/extension.json'), path.join(dest, 'antigravity-extension.json')); copy(path.join(APEX_DIR, 'AGENTS.md'), path.join(dest, 'AGENTS.md')); return 'antigravity-extension.json + AGENTS.md'; }
+    install: (root) => {
+      copyFixed(path.join(APEX_DIR, 'adapters/antigravity/extension.json'), path.join(root, 'antigravity-extension.json'));
+      copy(resolveSharedFile('AGENTS.md'), path.join(root, 'AGENTS.md'));
+      return 'antigravity-extension.json + AGENTS.md';
+    }
   },
   { id: 'openclaw', name: 'OpenClaw', icon: '🦞',
     detect: () => hasCommand('clawhub'),
-    install: (dest) => { copy(path.join(APEX_DIR, 'adapters/openclaw/package.json'), path.join(dest, 'openclaw-package.json')); copy(path.join(APEX_DIR, 'adapters/openclaw/apex.md'), path.join(dest, 'openclaw-apex.md')); return 'openclaw-package.json + apex.md'; }
+    install: (root) => {
+      copy(path.join(APEX_DIR, 'adapters/openclaw/package.json'), path.join(root, 'openclaw-package.json'));
+      copy(path.join(APEX_DIR, 'adapters/openclaw/apex.md'), path.join(root, 'openclaw-apex.md'));
+      return 'openclaw-package.json + apex.md';
+    }
   },
   { id: 'codewhale', name: 'CodeWhale', icon: '🐋',
     detect: () => false,
-    install: (dest) => { copy(path.join(APEX_DIR, 'adapters/codewhale/AGENTS.md'), path.join(dest, 'AGENTS.md')); return 'AGENTS.md'; }
+    install: (root) => {
+      copy(resolveSharedFile('AGENTS.md'), path.join(root, 'AGENTS.md'));
+      return 'AGENTS.md';
+    }
   },
   { id: 'swival', name: 'Swival', icon: '🐎',
     detect: () => hasCommand('swival'),
-    install: (dest) => { mkdir(path.join(dest, '.swival')); copy(path.join(APEX_DIR, 'adapters/swival/apex.md'), path.join(dest, 'swival-apex-skill.md')); copy(path.join(APEX_DIR, '.mcp.json'), path.join(dest, '.swival/mcp.json')); return 'swival-apex-skill.md + .swival/mcp.json'; }
+    install: (root) => {
+      mkdir(path.join(root, '.swival'));
+      copy(path.join(APEX_DIR, 'adapters/swival/apex.md'), path.join(root, 'swival-apex-skill.md'));
+      copyFixed(resolveSharedFile('.mcp.json'), path.join(root, '.swival/mcp.json'));
+      return 'swival-apex-skill.md + .swival/mcp.json';
+    }
   },
 ];
 
 // ─── Interactive Picker (arrow keys + space toggle) ─────────
-function picker(options, promptText, preSelected) {
+function picker(options, promptText) {
   return new Promise((resolve) => {
     const stdin = process.stdin;
     const stdout = process.stdout;
-    let selected = new Set(preSelected && preSelected.size > 0 ? [...preSelected] : []);
+    const selected = new Set();
     let cursor = 0, done = false;
     const wasRaw = stdin.isRaw;
     try { stdin.setRawMode(true); } catch {}
     stdin.resume(); stdin.setEncoding('utf8');
+    readline.emitKeypressEvents(stdin);
+    if (stdin.isTTY) stdin.setRawMode(true);
 
     function render() {
       const lines = [];
@@ -197,35 +314,49 @@ function picker(options, promptText, preSelected) {
         const box = isSel ? `${c.green}✓${c.reset}` : `${c.dim}○${c.reset}`;
         const arr = isCur ? `${c.cyan}→${c.reset}` : ' ';
         const hi = isCur ? c.bold : '';
-        const tag = o.detected ? ` ${c.green}${c.bold}(installed)${c.reset}` : '';
+        const tag = o.detected ? ` ${c.green}${c.bold}(detected)${c.reset}` : '';
         lines.push(`  ${arr} ${box} ${hi}${o.icon} ${o.name}${c.reset}${tag}`);
       }
       lines.push(`  ${c.dim}${'─'.repeat(56)}${c.reset}`);
       lines.push(`  ${c.dim}↑↓ move  Space select  Enter confirm  a toggle all${c.reset}`);
       lines.push('');
-      stdout.write('\x1B[2J\x1B[H' + lines.join('\n'));
-      try { readline.cursorTo(stdout, 1, 4 + cursor); } catch {}
+
+      stdout.write('\x1B[2J\x1B[H');
+      stdout.write(lines.join('\n') + '\n');
+      stdout.write(`\x1B[${4 + cursor};1H`);
+    }
+
+    function cleanup() {
+      done = true;
+      stdin.removeListener('keypress', onKey);
+      if (stdin.setRawMode) try { stdin.setRawMode(wasRaw === true); } catch {}
+      stdout.write('\x1B[?25h');
     }
 
     function onKey(str, key) {
       if (done || !key) return;
       if (key.name === 'up' || key.name === 'k') { cursor = Math.max(0, cursor - 1); render(); }
       else if (key.name === 'down' || key.name === 'j') { cursor = Math.min(options.length - 1, cursor + 1); render(); }
-      else if (key.name === 'space') { selected.has(cursor) ? selected.delete(cursor) : selected.add(cursor); render(); }
-      else if (key.name === 'a') { selected.size === options.length ? selected.clear() : options.forEach((_, i) => selected.add(i)); render(); }
+      else if (key.name === 'space') {
+        if (selected.has(cursor)) selected.delete(cursor);
+        else selected.add(cursor);
+        render();
+      }
+      else if (key.name === 'a') {
+        if (selected.size === options.length) selected.clear();
+        else for (let i = 0; i < options.length; i++) selected.add(i);
+        render();
+      }
       else if (key.name === 'return' || key.name === 'enter') {
-        done = true; stdin.removeListener('data', onKey);
-        if (stdin.setRawMode) try { stdin.setRawMode(wasRaw === true); } catch {}
-        stdout.write('\x1B[?25h');
+        cleanup();
         resolve([...selected].map(i => options[i]));
       }
       else if (key.name === 'escape' || (key.ctrl && key.name === 'c')) {
-        done = true; stdin.removeListener('data', onKey);
-        if (stdin.setRawMode) try { stdin.setRawMode(wasRaw === true); } catch {}
-        stdout.write('\x1B[?25h'); resolve([]);
+        cleanup();
+        resolve([]);
       }
     }
-    stdin.on('data', onKey);
+    stdin.on('keypress', onKey);
     render();
   });
 }
@@ -242,12 +373,11 @@ async function main() {
   const args = process.argv.slice(2);
   const yesMode = args.includes('--yes') || args.includes('-y');
 
-  // Banner
   console.log('');
   log(c.bold + c.white, '  APEX v2 — Senior Engineering Team');
   log(c.dim, '  =================================\n');
 
-  // Step 1: Detect
+  // Step 1: Detect installed agents
   log(c.cyan, '  Detecting installed agents...\n');
   const detectedIds = [];
   for (const agent of AGENTS) {
@@ -260,11 +390,8 @@ async function main() {
     warn('  No coding agents detected. You can still install manually.\n');
   }
 
-  // Step 2: Build options (ALL 16 agents, mark detected ones)
+  // Step 2: Build options — ALL agents displayed, NONE pre-selected
   const options = AGENTS.map(a => ({ ...a, detected: detectedIds.includes(a.id) }));
-
-  // Pre-select detected agents
-  const preSelected = new Set(options.map((o, i) => o.detected ? i : -1).filter(i => i >= 0));
 
   let chosen;
   if (yesMode) {
@@ -272,7 +399,7 @@ async function main() {
     if (chosen.length === 0) { warn('No agents detected. Use interactive mode to choose.'); process.exit(1); }
     log(c.dim, `  Auto-selecting detected agents...\n`);
   } else {
-    chosen = await picker(options, 'Select agents to install (Space to toggle, Enter to confirm):', preSelected);
+    chosen = await picker(options, 'Select agents to install (Space to toggle, Enter to confirm):');
   }
 
   if (chosen.length === 0) { warn('Nothing selected. Exiting.'); process.exit(0); }
@@ -286,34 +413,89 @@ async function main() {
     if (!ok) { warn('Cancelled.'); process.exit(0); }
   }
 
-  // Step 4: Create apex/ folder and install
+  // Step 4: Create apex/ directory with ALL shared APEX source files
   console.log('');
-  const apexDir = path.join(CWD, 'apex');
-  mkdir(apexDir);
-  log(c.cyan, '  Installing APEX files...\n');
+  log(c.cyan, '  Installing APEX shared files...\n');
+  mkdir(APEX);
 
-  // Copy AGENTS.md and .mcp.json into apex/
-  copy(path.join(APEX_DIR, 'AGENTS.md'), path.join(apexDir, 'AGENTS.md'));
-  ok('apex/AGENTS.md');
-
-  copy(path.join(APEX_DIR, '.mcp.json'), path.join(apexDir, '.mcp.json'));
-  ok('apex/.mcp.json');
-
-  // Copy skills/ into apex/skills/
-  const skillsSrc = path.join(APEX_DIR, 'skills');
-  if (dirExists(skillsSrc)) {
-    copyDir(skillsSrc, path.join(apexDir, 'skills'));
-    ok('apex/skills/ (25 skills)');
+  // Copy AGENTS.md and .mcp.json into apex/ (with path fixing for .mcp.json)
+  const agSrc = resolveSharedFile('AGENTS.md');
+  if (agSrc && fs.existsSync(agSrc)) {
+    copy(agSrc, path.join(APEX, 'AGENTS.md'));
+    ok('apex/AGENTS.md');
+  } else {
+    warn('AGENTS.md not found — skipping');
   }
 
-  // Step 5: Install each chosen agent
+  const mcpSrc = resolveSharedFile('.mcp.json');
+  if (mcpSrc && fs.existsSync(mcpSrc)) {
+    copyFixed(mcpSrc, path.join(APEX, '.mcp.json'));
+    ok('apex/.mcp.json');
+  } else {
+    warn('.mcp.json not found — MCP servers will not be configured');
+  }
+
+  if (dirExists(path.join(APEX_DIR, 'skills'))) {
+    copyDir(path.join(APEX_DIR, 'skills'), path.join(APEX, 'skills'));
+    ok('apex/skills/ (skills)');
+  }
+
+  if (dirExists(path.join(APEX_DIR, 'src'))) {
+    copyDir(path.join(APEX_DIR, 'src'), path.join(APEX, 'src'));
+    ok('apex/src/ (MCP servers & tools)');
+  }
+
+  if (dirExists(path.join(APEX_DIR, 'adapters'))) {
+    copyDir(path.join(APEX_DIR, 'adapters'), path.join(APEX, 'adapters'));
+    ok('apex/adapters/');
+  }
+
+  if (dirExists(path.join(APEX_DIR, 'agents'))) {
+    copyDir(path.join(APEX_DIR, 'agents'), path.join(APEX, 'agents'));
+    ok('apex/agents/ (10 agent definitions)');
+  }
+
+  if (dirExists(path.join(APEX_DIR, 'commands'))) {
+    copyDir(path.join(APEX_DIR, 'commands'), path.join(APEX, 'commands'));
+    ok('apex/commands/');
+  }
+
+  if (dirExists(path.join(APEX_DIR, '.opencode'))) {
+    copyDir(path.join(APEX_DIR, '.opencode'), path.join(APEX, '.opencode'));
+    ok('apex/.opencode/');
+  }
+
+  // Also copy .clinerules and root configs
+  copy(path.join(APEX_DIR, '.clinerules'), path.join(APEX, '.clinerules'));
+  ok('apex/.clinerules');
+
+  copy(path.join(APEX_DIR, 'opencode.json'), path.join(APEX, 'opencode.json'));
+  ok('apex/opencode.json');
+
+  // Copy hooks/ directory
+  if (dirExists(path.join(APEX_DIR, 'hooks'))) {
+    copyDir(path.join(APEX_DIR, 'hooks'), path.join(APEX, 'hooks'));
+    ok('apex/hooks/');
+  }
+
+  // Step 5: Install .mcp.json and AGENTS.md at project root (for agents that read from CWD)
+  if (mcpSrc && fs.existsSync(mcpSrc)) {
+    copyFixed(mcpSrc, path.join(CWD, '.mcp.json'));
+    ok('.mcp.json (project root, paths fixed)');
+  }
+  if (agSrc && fs.existsSync(agSrc)) {
+    copy(agSrc, path.join(CWD, 'AGENTS.md'));
+    ok('AGENTS.md (project root)');
+  }
+
+  // Step 6: Install each chosen agent — configs go to PROJECT ROOT with paths fixed
   console.log('');
   log(c.cyan, '  Configuring agents...\n');
 
   const summary = [];
   for (const agent of chosen) {
     try {
-      const info = agent.install(apexDir);
+      const info = agent.install(CWD);
       ok(`${agent.name} — ${info}`);
       summary.push(agent.name);
     } catch (e) {
@@ -321,12 +503,12 @@ async function main() {
     }
   }
 
-  // Step 6: Summary
+  // Step 7: Summary
   console.log('');
   log(c.bold + c.green, '  === Installation Complete ===');
   console.log('');
   log(c.white, `  Installed for ${summary.length} agent(s): ${summary.join(', ')}`);
-  log(c.white, `  Files location: ${apexDir}/`);
+  log(c.white, `  APEX files: ${APEX}/`);
   console.log('');
   log(c.dim, '  Quick Start — talk to your coding agent:');
   log(c.white, '    @arch refactor this    → Max compresses code');
