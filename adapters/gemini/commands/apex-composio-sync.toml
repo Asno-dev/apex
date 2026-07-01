@@ -1,7 +1,0 @@
-[command]
-name = "apex-composio-sync"
-description = "Force sync from Composio backend"
-help = """
-# apex-composio-sync
-Force refresh tool definitions from the Composio backend.
-"""

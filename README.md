@@ -2,9 +2,9 @@
   <img src="https://img.shields.io/npm/v/@asno-dev/apex?style=flat-square&color=0ea5e9" alt="npm version" />
   <img src="https://img.shields.io/npm/dm/@asno-dev/apex?style=flat-square&color=38bdf8" alt="npm downloads" />
   <img src="https://img.shields.io/npm/l/@asno-dev/apex?style=flat-square&color=22c55e" alt="license" />
-  <img src="https://img.shields.io/badge/agents-10-blueviolet?style=flat-square" alt="agents" />
+  <img src="https://img.shields.io/badge/agents-13-blueviolet?style=flat-square" alt="agents" />
   <img src="https://img.shields.io/badge/tools-56-orange?style=flat-square" alt="tools" />
-  <img src="https://img.shields.io/badge/adapters-12-blue?style=flat-square" alt="adapters" />
+  <img src="https://img.shields.io/badge/adapters-13-blue?style=flat-square" alt="adapters" />
   <img src="https://img.shields.io/badge/node-%3E%3D18-green?style=flat-square" alt="node" />
 </p>
 
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  A zero-dependency orchestrator that routes your requests to 10 specialist AI agents — each with domain expertise, purpose-built tools, and the ability to dynamically call peers mid-task. Works with <strong>12 coding agents</strong> out of the box.
+  A zero-dependency orchestrator that routes your requests to 10 specialist AI agents — each with domain expertise, purpose-built tools, and the ability to dynamically call peers mid-task. Works with <strong>13 coding agents</strong> out of the box.
 </p>
 
 <p align="center">
@@ -570,6 +570,32 @@ npx @asno-dev/apex copilot
 
 ---
 
+### KiloCode / Kiro
+
+```bash
+npx @asno-dev/apex kilocode
+```
+
+<details>
+<summary><strong>.kilo/mcp.json</strong> — MCP + steering + agents for KiloCode</summary>
+
+```json
+{
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  }
+}
+```
+</details>
+
+**Installs:** `.kilo/mcp.json`, `.kilo/steering/apex.md`, `.kilo/agents/` (10 `.md`), `.kilo/commands/` (8 `.md`)
+
+**Then:** KiloCode loads steering + agents + MCP automatically on project open.
+
+---
+
 ## ⌨️ Commands
 
 | Command | Description |
@@ -704,7 +730,7 @@ npm test
 
 | Directory | Purpose |
 |:----------|:--------|
-| `adapters/` | Per-agent config files (12 agents) |
+| `adapters/` | Per-agent config files (13 agents) |
 | `agents/` | Canonical agent definitions (10 agents) |
 | `commands/` | Canonical command definitions (8 commands) |
 | `skills/` | SKILL.md files for orchestrator and agents |

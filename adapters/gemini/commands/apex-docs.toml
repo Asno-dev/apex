@@ -1,8 +1,0 @@
-[command]
-name = "apex-docs"
-description = "Create/edit Word documents via OfficeCLI"
-help = """
-# apex-docs
-Create and edit Microsoft Word documents from natural language.
-Usage: tell the agent what document you need, it handles content and formatting.
-"""

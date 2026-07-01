@@ -1,7 +1,0 @@
-[command]
-name = "apex-composio-status"
-description = "Show connected tools and API key status"
-help = """
-# apex-composio-status
-Show all connected Composio tools and their authentication status.
-"""
