@@ -1,22 +1,8 @@
 [command]
-name = "excel"
-description = "[Excel] Create/edit Excel spreadsheets via OfficeCLI (apex-excel)"
+name = "apex-excel"
+description = "Create/edit Excel spreadsheets via OfficeCLI"
 help = """
-# Excel Spreadsheet Creation
-
-Use OfficeCLI to create and edit Excel spreadsheets.
-
-## How to use
-Tell the agent what spreadsheet you need. It will run:
-```bash
-npx office-cli excel create --path "output.xlsx" --data "data.json"
-npx office-cli excel edit --path "spreadsheet.xlsx"
-```
-
-## Examples
-- "Create a budget spreadsheet with income, expenses, and totals"
-- "Generate a sales report with charts from CSV data"
-- "Create a project timeline with Gantt chart formatting"
-
-The agent handles data structure, formulas, charts, and formatting.
+# apex-excel
+Create and edit Excel spreadsheets from natural language.
+Usage: describe the spreadsheet you need (budget, report, chart data, etc.).
 """

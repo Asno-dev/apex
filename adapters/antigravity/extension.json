@@ -1,35 +1,44 @@
 {
   "name": "apex",
   "version": "3.0.0",
-  "description": "APEX v2 — 10-agent senior engineering team. Full feature set: 10 specialist agents, 3 MCP servers (56+1000+ tools), Composio integration, Mirage VFS, OfficeCLI, 3 modes, dynamic peer calling.",
+  "description": "APEX v2 — 10-agent senior engineering team. @arch architect, @ui UI, @debug debug, @perf perf, @sec security, @infra infra, @nova creative, @reed research, @review review, @flex MVP. 3 MCP servers, Composio (1000+ tools), Mirage VFS (50+ backends), OfficeCLI.",
   "contextFileName": "AGENTS.md",
   "mcpServers": {
     "apex-hands": {
       "type": "local",
-      "command": ["node", "src/hands-server.mjs"]
+      "command": ["node", "apex/src/hands-server.mjs"]
     },
     "mirage-vfs": {
       "type": "local",
-      "command": ["node", "src/mirage-server.mjs"]
+      "command": ["node", "apex/src/mirage-server.mjs"]
     },
     "apex-composio": {
       "type": "local",
-      "command": ["node", "src/composio-server.mjs"]
+      "command": ["node", "apex/src/composio-server.mjs"]
     }
   },
-  "subagents": {
-    "arch": { "name": "Max", "role": "Architect" },
-    "ui": { "name": "Zara", "role": "UI/UX Designer" },
-    "debug": { "name": "Kai", "role": "Debugger" },
-    "perf": { "name": "Rex", "role": "Performance Engineer" },
-    "sec": { "name": "Vex", "role": "Security Engineer" },
-    "infra": { "name": "Io", "role": "Infrastructure Engineer" },
-    "nova": { "name": "Nova", "role": "Creative" },
-    "reed": { "name": "Dr.Reed", "role": "Researcher" },
-    "review": { "name": "Rila", "role": "Reviewer" },
-    "flex": { "name": "Flex", "role": "Founder/PM" }
-  },
-  "commands": ["apex", "docs", "excel", "ppt", "composio-setup", "composio-status", "composio-sync", "mirage"],
+  "subagents": [
+    {"name": "arch", "tag": "@arch", "description": "Max the Architect — system design, refactoring"},
+    {"name": "ui", "tag": "@ui", "description": "Zara the UI Painter — UI/UX design, Tailwind, shadcn/ui"},
+    {"name": "debug", "tag": "@debug", "description": "Kai the Debugger — 5-step debug protocol"},
+    {"name": "perf", "tag": "@perf", "description": "Rex the Performance Engineer — profiling, optimization"},
+    {"name": "sec", "tag": "@sec", "description": "Vex the Security Engineer — OWASP, vuln scanning"},
+    {"name": "infra", "tag": "@infra", "description": "Io the Infrastructure Engineer — Docker, k8s, CI/CD"},
+    {"name": "nova", "tag": "@nova", "description": "Nova the Creative — novel approaches, POCs"},
+    {"name": "reed", "tag": "@reed", "description": "Dr.Reed the Researcher — evidence-based analysis"},
+    {"name": "review", "tag": "@review", "description": "Rila the Reviewer — PR reviews, diff analysis"},
+    {"name": "flex", "tag": "@flex", "description": "Flex the Founder — value/cost scoring, MVP cutting"}
+  ],
+  "commands": [
+    {"name": "apex", "description": "APEX v2 control — mode switching, agent activation, help"},
+    {"name": "apex-docs", "description": "Create/edit Word documents via OfficeCLI"},
+    {"name": "apex-excel", "description": "Create/edit Excel spreadsheets via OfficeCLI"},
+    {"name": "apex-ppt", "description": "Create PowerPoint presentations via OfficeCLI"},
+    {"name": "apex-composio-setup", "description": "Connect external tools via Composio"},
+    {"name": "apex-composio-status", "description": "Show connected Composio tools"},
+    {"name": "apex-composio-sync", "description": "Force sync from Composio backend"},
+    {"name": "apex-mirage", "description": "Execute commands across Mirage VFS backends"}
+  ],
   "features": {
     "modes": ["direct", "team", "select"],
     "composio": true,

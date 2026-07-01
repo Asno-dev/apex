@@ -1,23 +1,7 @@
 [command]
-name = "composio-status"
-description = "[Composio] Show connected tools via apex-composio-status"
+name = "apex-composio-status"
+description = "Show connected tools and API key status"
 help = """
-# Composio Status
-
-Check which Composio tools are connected.
-
-## Run
-```bash
-node src/composio-status.mjs
-```
-
-## Shows
-- API key status (configured / missing)
-- Connected tools list with status (ACTIVE / INACTIVE)
-- Connection IDs for each tool
-- Quick usage examples
-
-## Related
-- `/composio-setup` — Add a new tool connection
-- `/composio-sync` — Force sync from backend
+# apex-composio-status
+Show all connected Composio tools and their authentication status.
 """

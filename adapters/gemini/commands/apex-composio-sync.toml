@@ -1,22 +1,7 @@
 [command]
-name = "composio-sync"
-description = "[Composio] Force sync via apex-composio-sync"
+name = "apex-composio-sync"
+description = "Force sync from Composio backend"
 help = """
-# Composio Sync
-
-Force refresh all connected Composio tools.
-
-## Run
-```bash
-node src/composio-status.mjs --sync
-```
-
-## What it does
-- Re-fetches all tool definitions from Composio API
-- Syncs connection status for all registered tools
-- Updates the MCP tool list with latest schemas
-
-## Related
-- `/composio-setup` — Add a new tool connection
-- `/composio-status` — Check connection status
+# apex-composio-sync
+Force refresh tool definitions from the Composio backend.
 """

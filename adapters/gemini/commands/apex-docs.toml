@@ -1,22 +1,8 @@
 [command]
-name = "docs"
-description = "[Docs] Create/edit Word documents via OfficeCLI (apex-docs)"
+name = "apex-docs"
+description = "Create/edit Word documents via OfficeCLI"
 help = """
-# Word Document Creation
-
-Use OfficeCLI to create and edit Word documents.
-
-## How to use
-Tell the agent what document you need. It will run:
-```bash
-npx office-cli document create --path "output.docx" --title "Document Title"
-npx office-cli document edit --path "document.docx"
-```
-
-## Examples
-- "Create a project proposal with sections for overview, timeline, and budget"
-- "Generate a monthly report from results.json"
-- "Create a meeting minutes template with attendees, agenda, action items"
-
-The agent handles content structure, formatting, and generation.
+# apex-docs
+Create and edit Microsoft Word documents from natural language.
+Usage: tell the agent what document you need, it handles content and formatting.
 """
