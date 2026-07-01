@@ -24,8 +24,6 @@
     "CLAUDE.md",
     "USAGE.md",
     "opencode.json",
-    "gemini-extension.json",
-    "plugin.json",
     "plugin.yaml"
   ],
   "scripts": {
@@ -35,8 +33,8 @@
   },
   "keywords": [
     "ai", "coding-agent", "claude-code", "cursor", "opencode",
-    "cline", "copilot", "windsurf", "gemini", "devin", "hermes",
-    "codex", "code-review", "debugging", "performance", "security",
+    "cline", "gemini", "codex", "antigravity",
+    "code-review", "debugging", "performance", "security",
     "architecture", "10-agent", "orchestrator", "apex", "mcp",
     "composio", "mirage", "subagents", "coding-assistant"
   ],

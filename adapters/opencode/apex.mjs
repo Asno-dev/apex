@@ -96,14 +96,6 @@ UI (Zara): 5-color :root vars. 2 fonts. shadcn/ui. Tailwind scale. WCAG AA. 200m
 REFACTOR (Max): Comment→rename. Twice→extract. Inherit→compose. 20+→abstraction. Boolean→split. Nested→pipe.
 `.trim();
 
-export function parseCommandFile(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8');
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-  if (!match) return null;
-  const description = match[1].match(/description:\s*(.+)/)?.[1]?.trim();
-  return { description, template: match[2].trim() };
-}
-
 export default async ({ client } = {}) => {
   const log = (level, msg) => {
     try { client?.app?.log({ body: { service: 'apex', level, message: msg } }); } catch {}
@@ -113,16 +105,6 @@ export default async ({ client } = {}) => {
 
   return {
     config: async (config) => {
-      if (!config.command) config.command = {};
-      const cmdDir = path.join(__dirname, '..', 'command');
-      try {
-        for (const file of fs.readdirSync(cmdDir).filter(f => f.endsWith('.md'))) {
-          const name = path.basename(file, '.md');
-          const parsed = parseCommandFile(path.join(cmdDir, file));
-          if (parsed) config.command[name] = parsed;
-        }
-      } catch {}
-
       config.skills = config.skills || {};
       config.skills.paths = config.skills.paths || [];
       if (!config.skills.paths.includes(skillsDir)) {

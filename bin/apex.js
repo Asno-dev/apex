@@ -51,9 +51,10 @@ console.log('  ✓ Shared APEX files → apex/');
 // ── Agent installers ──
 const install = {
   'claude-code': () => {
-    const d = path.join(CWD, '.claude'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.claude'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands')); mkdir(path.join(d, 'hooks'));
     copyFixed(path.join(ROOT, 'adapters/claude-code/plugin.json'), path.join(d, 'plugin.json'));
     copy(path.join(ROOT, 'adapters/claude-code/hooks.json'), path.join(d, 'hooks.json'));
+    copyDir(path.join(ROOT, 'hooks'), path.join(d, 'hooks'));
     copyDir(path.join(ROOT, 'adapters/claude-code/agents'), path.join(d, 'agents'));
     copyDir(path.join(ROOT, 'adapters/claude-code/commands'), path.join(d, 'commands'));
     return '.claude/ (plugin, agents, commands, hooks, MCP)';
