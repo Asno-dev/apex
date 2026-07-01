@@ -4,8 +4,7 @@
   <img src="https://img.shields.io/npm/l/@asno-dev/apex?style=flat-square&color=22c55e" alt="license" />
   <img src="https://img.shields.io/badge/agents-10-blueviolet?style=flat-square" alt="agents" />
   <img src="https://img.shields.io/badge/tools-56-orange?style=flat-square" alt="tools" />
-  <img src="https://img.shields.io/badge/skills-25-teal?style=flat-square" alt="skills" />
-   <img src="https://img.shields.io/badge/adapters-7-blue?style=flat-square" alt="adapters" />
+  <img src="https://img.shields.io/badge/adapters-12-blue?style=flat-square" alt="adapters" />
   <img src="https://img.shields.io/badge/node-%3E%3D18-green?style=flat-square" alt="node" />
 </p>
 
@@ -16,14 +15,12 @@
 </p>
 
 <p align="center">
-  A zero-dependency orchestrator that routes your requests to 10 specialist AI agents — each with domain expertise, purpose-built tools, and the ability to dynamically call peers mid-task. Works with <strong>7 coding agents</strong> out of the box.
+  A zero-dependency orchestrator that routes your requests to 10 specialist AI agents — each with domain expertise, purpose-built tools, and the ability to dynamically call peers mid-task. Works with <strong>12 coding agents</strong> out of the box.
 </p>
 
 <p align="center">
-  <a href="#-quick-start">Quick Start</a> •
   <a href="#-agents">Agents</a> •
   <a href="#-installation">Installation</a> •
-  <a href="#-skills">Skills</a> •
   <a href="#-mcp-servers">MCP Servers</a> •
   <a href="#%EF%B8%8F-commands">Commands</a> •
   <a href="#-composio-integration">Composio</a> •
@@ -36,12 +33,13 @@
 ## 🚀 Quick Start
 
 ```bash
-npx @asno-dev/apex
+npx @asno-dev/apex                       # Install shared APEX files (apex/ folder)
+npx @asno-dev/apex claude-code            # Install for your coding agent
 ```
 
-The installer detects your coding agents and configures everything — MCP servers, agents, commands, skills.
+No auto-detection. No interactive prompts. You pick your agent, one command.
 
-That's it. Now talk to your coding agent:
+Then use `@agentName` in your coding agent:
 
 ```
 @arch refactor this                → Max compresses your code
@@ -54,24 +52,6 @@ That's it. Now talk to your coding agent:
 @reed best caching strategy        → Dr. Reed compares options with evidence
 @review check this code            → Rila gives structured PR review
 @flex what's the MVP?              → Flex scores Value×Cost and cuts scope
-```
-
-### Built-in Commands
-
-```
-apex-docs                          → Create Word/Excel/PPT documents
-apex-excel
-apex-ppt
-
-node apex/src/composio-setup.mjs       → Connect 1000+ external tools (Gmail, GitHub, Slack, etc.)
-node apex/src/composio-status.mjs      → Show connected tools status
-node apex/src/composio-status.mjs --sync → Force sync from Composio backend
-
-apex-mirage ls /s3/                → Virtual filesystem across 50+ backends
-
-/apex team                         → Switch to team mode (default)
-/apex select a,b                   → Activate only specific agents
-/apex status                       → Show current mode and active agents
 ```
 
 ---
@@ -93,9 +73,7 @@ APEX ships with **10 specialist agents**, each with a unique persona, domain exp
 | `[Rev]` | `@review` | **Rila** | Code Reviewer | Blocking → Suggestions → Praise. Specific praise always. |
 | `[Fnd]` | `@flex` | **Flex** | Founder / PM | Value(1-3) × Cost(1-3). Ships 60%, defers 30%, kills 10%. |
 
-### Automatic Routing
-
-The orchestrator analyzes your request and routes to the best agent automatically:
+### Routing
 
 | Your Request | Routed To |
 |:-------------|:----------|
@@ -110,9 +88,15 @@ The orchestrator analyzes your request and routes to the best agent automaticall
 | Review / PR / merge / quality | `@review` |
 | Scope / MVP / what to build | `@flex` |
 
-### Task States
+### Modes
 
-Every agent reports progress with a single icon:
+| Mode | Usage | Description |
+|:----:|:------|:------------|
+| **Direct** | `@agent` | That agent = main agent with full authority. Calls peers via `@peerName`. |
+| **Team (default)** | auto | Orchestrator routes to best agent. Agent calls peers dynamically. |
+| **Select** | `/apex select a,b` | Only those agents active until changed. |
+
+### Task States
 
 ```
 🧠 Thinking  →  🔍 Exploring  →  ⚡ Working  →  🔧 Fixing  →  ✅ Verifying  →  ✨ Complete
@@ -120,83 +104,473 @@ Every agent reports progress with a single icon:
 
 ---
 
-## 🎛️ Modes
-
-APEX supports three operating modes:
-
-### Team Mode (Default)
-The orchestrator routes your request to the best agent. That agent works and dynamically calls peers when needed. Zero pre-loading.
-
-```
-> refactor and optimize the API layer
-# Orchestrator routes → @arch → @arch calls @perf when spotting N+1 queries
-```
-
-### Direct Mode
-Address a specific agent directly. That agent becomes the lead with full authority.
-
-```
-@debug fix the authentication timeout
-# Kai works directly, can still call @sec if a vulnerability is found
-```
-
-### Select Mode
-Activate only specific agents for a focused session.
-
-```
-/apex select kai,rex              # Only debugger and performance active
-/apex select arch,ui,infra        # Architecture + UI + Infrastructure
-```
-
-### Mode Commands
-
-| Command | Description |
-|:--------|:------------|
-| `/apex team` | Switch to team mode (default) |
-| `/apex select a,b` | Activate only specific agents |
-| `/apex off` | Disable APEX |
-| `/apex status` | Show current mode and active agents |
-| `/apex help` | Show help guide |
-
----
-
 ## 📦 Installation
 
-APEX supports **7 coding agents** — run once and everything is configured.
+No auto-detection. No interactive picker. Three steps:
+
+### 1. Install shared APEX files
 
 ```bash
 npx @asno-dev/apex
 ```
 
-The installer auto-detects your agents and installs all APEX files into `apex/` + per-agent configs at the project root.
+Creates `apex/` in your project with MCP servers, skills, agent definitions, and commands.
 
-| Agent | Installed Files | `@arch` Works | MCP | Commands |
-|:------|:----------------|:-------------:|:---:|:--------:|
-| **Claude Code** | `.claude/plugin.json` + agents + commands + hooks | ✅ Native subagents | ✅ 3 servers | ✅ 8 commands |
-| **Gemini CLI** | `.gemini/extension.json` + agents + commands | ✅ Extension agents | ✅ 3 servers | ✅ 8 commands |
-| **Codex CLI** | `.codex/plugin.json` + mcp.toml + agents + skills | ✅ Native subagents | ✅ 3 servers | ✅ skills |
-| **OpenCode** | `opencode.json` + plugin + `.opencode/agents/` | ✅ Native agents | ✅ 3 servers | ✅ via plugin |
-| **Cursor** | `.cursor/mcp.json` + rules + agents + commands | ✅ Rule-based | ✅ 3 servers | ✅ 8 commands |
-| **Antigravity** | `antigravity-extension.json` + `AGENTS.md` | ✅ Extension agents | ✅ 3 servers | ✅ via extension |
-| **Cline / Kilo** | `.cline/mcp.json` + rules + agents + commands + `.clinerules` | ✅ Rule-based | ✅ 3 servers | ✅ 8 commands |
+### 2. Copy the MCP config
 
-### Verify
+<details>
+<summary><strong>.mcp.json</strong> — 3 MCP servers: apex-hands (56 tools), mirage-vfs (50+ backends), apex-composio (1000+ tools)</summary>
 
-| Agent | Command |
-|:------|:--------|
-| **Claude Code** | `claude` → type `@arch` → Max responds |
-| **Codex CLI** | `codex` → type `@arch` → Max responds |
-| **Gemini CLI** | `gemini` → type `@arch` → Max responds |
-| **OpenCode** | `opencode` → type `@arch` → Max responds |
-| **Cursor** | Open project — MCP servers + rules active |
-| **Cline / Kilo** | Open project — MCP servers + rules active |
-| **Antigravity** | `agy` → type `@arch` → Max responds |
+```json
+{
+  "mcpServers": {
+    "apex-hands": {
+      "command": ["node", "apex/src/hands-server.mjs"],
+      "type": "local"
+    },
+    "mirage-vfs": {
+      "command": ["node", "apex/src/mirage-server.mjs"],
+      "type": "local"
+    },
+    "apex-composio": {
+      "command": ["node", "apex/src/composio-server.mjs"],
+      "type": "local"
+    }
+  }
+}
+```
+</details>
+
+### 3. Install for your coding agent
+
+Choose your agent below. Each section shows the one-liner install and the files it creates.
+
+---
+
+### Claude Code
+
+```bash
+npx @asno-dev/apex claude-code
+```
+
+<details>
+<summary><strong>.claude/plugin.json</strong> — 10 subagents, 8 commands, 3 MCP servers, lifecycle hooks</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "hooks": "./hooks.json",
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  },
+  "subagents": ["agents/arch.md", "agents/ui.md", "agents/debug.md", "agents/perf.md", "agents/sec.md", "agents/infra.md", "agents/nova.md", "agents/reed.md", "agents/review.md", "agents/flex.md"],
+  "commands": ["commands/apex.md", "commands/apex-docs.md", "commands/apex-excel.md", "commands/apex-ppt.md", "commands/apex-composio-setup.md", "commands/apex-composio-status.md", "commands/apex-composio-sync.md", "commands/apex-mirage.md"]
+}
+```
+</details>
+
+**Installs:** `.claude/plugin.json`, `.claude/hooks.json`, `.claude/agents/` (10), `.claude/commands/` (8), `.claude/hooks/` (4)
+
+**Then in Claude Code:** `/plugin update`
+
+---
+
+### Codex CLI
+
+```bash
+npx @asno-dev/apex codex
+```
+
+<details>
+<summary><strong>.codex/plugin.json</strong> — 10 subagents, 3 MCP servers, skills</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "3.0.0",
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  },
+  "subagents": ["agents/arch.toml", "agents/ui.toml", "agents/debug.toml", "agents/perf.toml", "agents/sec.toml", "agents/infra.toml", "agents/nova.toml", "agents/reed.toml", "agents/review.toml", "agents/flex.toml"],
+  "commands": ["apex", "apex-docs", "apex-excel", "apex-ppt", "apex-composio-setup", "apex-composio-status", "apex-composio-sync", "apex-mirage"]
+}
+```
+</details>
+
+**Installs:** `.codex/plugin.json`, `.codex/mcp.toml`, `.codex/agents/` (10 `.toml`), `.codex/SKILLS.md`
+
+**Then in Codex:** `codex plugin update`
+
+---
+
+### Gemini CLI
+
+```bash
+npx @asno-dev/apex gemini
+```
+
+<details>
+<summary><strong>.gemini/extension.json</strong> — 10 agents, 8 commands, 3 MCP servers, AGENTS.md</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "contextFileName": "AGENTS.md",
+  "mcpServers": {
+    "apex-hands": { "command": "node apex/src/hands-server.mjs", "type": "local" },
+    "mirage-vfs": { "command": "node apex/src/mirage-server.mjs", "type": "local" },
+    "apex-composio": { "command": "node apex/src/composio-server.mjs", "type": "local" }
+  },
+  "agents": [
+    {"name": "arch", "file": "agents/arch.md", "tag": "@arch"},
+    {"name": "ui", "file": "agents/ui.md", "tag": "@ui"},
+    {"name": "debug", "file": "agents/debug.md", "tag": "@debug"},
+    {"name": "perf", "file": "agents/perf.md", "tag": "@perf"},
+    {"name": "sec", "file": "agents/sec.md", "tag": "@sec"},
+    {"name": "infra", "file": "agents/infra.md", "tag": "@infra"},
+    {"name": "nova", "file": "agents/nova.md", "tag": "@nova"},
+    {"name": "reed", "file": "agents/reed.md", "tag": "@reed"},
+    {"name": "review", "file": "agents/review.md", "tag": "@review"},
+    {"name": "flex", "file": "agents/flex.md", "tag": "@flex"}
+  ],
+  "commands": [
+    {"name": "apex", "file": "commands/apex.toml"},
+    {"name": "apex-docs", "file": "commands/apex-docs.toml"},
+    {"name": "apex-excel", "file": "commands/apex-excel.toml"},
+    {"name": "apex-ppt", "file": "commands/apex-ppt.toml"},
+    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.toml"},
+    {"name": "apex-composio-status", "file": "commands/apex-composio-status.toml"},
+    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.toml"},
+    {"name": "apex-mirage", "file": "commands/apex-mirage.toml"}
+  ]
+}
+```
+</details>
+
+**Installs:** `.gemini/extension.json`, `.gemini/agents/` (10 `.md`), `.gemini/commands/` (8 `.toml`), `AGENTS.md`
+
+**Then:** `gemini extensions install`
+
+---
+
+### Cursor
+
+```bash
+npx @asno-dev/apex cursor
+```
+
+<details>
+<summary><strong>.cursor/mcp.json</strong> — MCP + rules for Cursor</summary>
+
+```json
+{
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  }
+}
+```
+</details>
+
+**Installs:** `.cursor/mcp.json`, `.cursor/rules/apex.mdc`, `.cursor/agents/` (10 `.mdc`), `.cursor/commands/` (8 `.md`)
+
+**Zero setup** — Cursor loads rules + MCP automatically on project open.
+
+---
+
+### Cline / Kilo
+
+```bash
+npx @asno-dev/apex cline
+```
+
+<details>
+<summary><strong>.cline/mcp.json</strong> — MCP + rules for Cline</summary>
+
+```json
+{
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  }
+}
+```
+</details>
+
+**Installs:** `.cline/mcp.json`, `.cline/rules/apex.mdc`, `.cline/agents/` (10 `.mdc`), `.cline/commands/` (8 `.md`), `.clinerules`
+
+---
+
+### OpenCode
+
+```bash
+npx @asno-dev/apex opencode
+```
+
+<details>
+<summary><strong>opencode.json</strong> — Plugin config with MCP servers</summary>
+
+```json
+{
+  "plugin": ["./adapters/opencode/apex.mjs"],
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"] },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"] },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"] }
+  }
+}
+```
+</details>
+
+**Installs:** `opencode.json`, `adapters/opencode/apex.mjs`, `.opencode/agents/` (10)
+
+---
+
+### Antigravity CLI
+
+```bash
+npx @asno-dev/apex antigravity
+```
+
+<details>
+<summary><strong>antigravity-extension.json</strong> — Extension for <code>agy</code> binary</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "3.0.0",
+  "contextFileName": "AGENTS.md",
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  },
+  "subagents": {
+    "arch": { "name": "Max", "role": "Architect" },
+    "ui": { "name": "Zara", "role": "UI/UX Designer" },
+    "debug": { "name": "Kai", "role": "Debugger" },
+    "perf": { "name": "Rex", "role": "Performance Engineer" },
+    "sec": { "name": "Vex", "role": "Security Engineer" },
+    "infra": { "name": "Io", "role": "Infrastructure Engineer" },
+    "nova": { "name": "Nova", "role": "Creative" },
+    "reed": { "name": "Dr.Reed", "role": "Researcher" },
+    "review": { "name": "Rila", "role": "Reviewer" },
+    "flex": { "name": "Flex", "role": "Founder/PM" }
+  },
+  "commands": ["apex", "docs", "excel", "ppt", "composio-setup", "composio-status", "composio-sync", "mirage"],
+  "features": { "modes": ["direct", "team", "select"], "composio": true, "mirage": true, "officecli": true }
+}
+```
+</details>
+
+**Installs:** `antigravity-extension.json`, `AGENTS.md`
+
+**Then:** `agy plugin install`
+
+---
+
+### Devin CLI
+
+```bash
+npx @asno-dev/apex devin
+```
+
+<details>
+<summary><strong>.devin/plugin.json</strong> — 10 agents, 8 commands, 3 MCP servers</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  },
+  "agents": [
+    {"name": "arch", "file": "agents/arch.md", "tag": "@arch"},
+    {"name": "ui", "file": "agents/ui.md", "tag": "@ui"},
+    {"name": "debug", "file": "agents/debug.md", "tag": "@debug"},
+    {"name": "perf", "file": "agents/perf.md", "tag": "@perf"},
+    {"name": "sec", "file": "agents/sec.md", "tag": "@sec"},
+    {"name": "infra", "file": "agents/infra.md", "tag": "@infra"},
+    {"name": "nova", "file": "agents/nova.md", "tag": "@nova"},
+    {"name": "reed", "file": "agents/reed.md", "tag": "@reed"},
+    {"name": "review", "file": "agents/review.md", "tag": "@review"},
+    {"name": "flex", "file": "agents/flex.md", "tag": "@flex"}
+  ],
+  "commands": [
+    {"name": "apex", "file": "commands/apex.md"},
+    {"name": "apex-docs", "file": "commands/apex-docs.md"},
+    {"name": "apex-excel", "file": "commands/apex-excel.md"},
+    {"name": "apex-ppt", "file": "commands/apex-ppt.md"},
+    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.md"},
+    {"name": "apex-composio-status", "file": "commands/apex-composio-status.md"},
+    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.md"},
+    {"name": "apex-mirage", "file": "commands/apex-mirage.md"}
+  ]
+}
+```
+</details>
+
+**Installs:** `.devin/plugin.json`, `.devin/agents/` (10 `.md`), `.devin/commands/` (8 `.md`)
+
+**Then:** `devin plugins install`
+
+---
+
+### Hermes Agent
+
+```bash
+npx @asno-dev/apex hermes
+```
+
+<details>
+<summary><strong>.hermes/plugin.json</strong> — 10 agents, 3 MCP servers, 8 commands</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
+  },
+  "agents": [
+    {"name": "arch", "file": "agents/arch.md", "tag": "@arch"},
+    {"name": "ui", "file": "agents/ui.md", "tag": "@ui"},
+    {"name": "debug", "file": "agents/debug.md", "tag": "@debug"},
+    {"name": "perf", "file": "agents/perf.md", "tag": "@perf"},
+    {"name": "sec", "file": "agents/sec.md", "tag": "@sec"},
+    {"name": "infra", "file": "agents/infra.md", "tag": "@infra"},
+    {"name": "nova", "file": "agents/nova.md", "tag": "@nova"},
+    {"name": "reed", "file": "agents/reed.md", "tag": "@reed"},
+    {"name": "review", "file": "agents/review.md", "tag": "@review"},
+    {"name": "flex", "file": "agents/flex.md", "tag": "@flex"}
+  ],
+  "commands": [
+    {"name": "apex", "file": "commands/apex.md"},
+    {"name": "apex-docs", "file": "commands/apex-docs.md"},
+    {"name": "apex-excel", "file": "commands/apex-excel.md"},
+    {"name": "apex-ppt", "file": "commands/apex-ppt.md"},
+    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.md"},
+    {"name": "apex-composio-status", "file": "commands/apex-composio-status.md"},
+    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.md"},
+    {"name": "apex-mirage", "file": "commands/apex-mirage.md"}
+  ]
+}
+```
+</details>
+
+**Installs:** `.hermes/plugin.json`, `.hermes/agents/` (10 `.md`), `.hermes/commands/` (8 `.md`)
+
+**Then:** `hermes plugins install apex --enable`
+
+---
+
+### Pi Agent Harness
+
+```bash
+npx @asno-dev/apex pi
+```
+
+<details>
+<summary><strong>.pi/package.json</strong> — Pi extension with MCP servers</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "main": "index.js",
+  "pi": {
+    "mcpServers": {
+      "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"] },
+      "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"] },
+      "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"] }
+    },
+    "agents": ["arch", "ui", "debug", "perf", "sec", "infra", "nova", "reed", "review", "flex"],
+    "commands": ["apex", "apex-docs", "apex-excel", "apex-ppt", "apex-composio-setup", "apex-composio-status", "apex-composio-sync", "apex-mirage"],
+    "features": { "modes": ["direct", "team", "select"], "composio": true, "mirage": true, "officecli": true }
+  }
+}
+```
+</details>
+
+**Installs:** `.pi/package.json`, `.pi/index.js`, `.pi/agents/` (10 `.md`), `.pi/commands/` (8 `.md`)
+
+**Then:** `pi install .`
+
+---
+
+### OpenClaw
+
+```bash
+npx @asno-dev/apex openclaw
+```
+
+<details>
+<summary><strong>.openclaw/skills/manifest.json</strong> — 10 agent skills, 3 MCP servers</summary>
+
+```json
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "skills": ["arch", "ui", "debug", "perf", "sec", "infra", "nova", "reed", "review", "flex"],
+  "mcpServers": {
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"] },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"] },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"] }
+  }
+}
+```
+</details>
+
+**Installs:** `.openclaw/skills/manifest.json`, `.openclaw/skills/` (10), `.openclaw/commands/` (8 `.md`)
+
+**Then:** `clawhub install apex`
+
+---
+
+### GitHub Copilot CLI
+
+```bash
+npx @asno-dev/apex copilot
+```
+
+<details>
+<summary><strong>.github/copilot-instructions.md</strong> — Always-on instructions for Copilot CLI</summary>
+
+```markdown
+# APEX v2 — 10-Agent Senior Engineering Team
+
+@arch Max (Architect) | @ui Zara (UI/UX) | @debug Kai (Debugger)
+@perf Rex (Performance) | @sec Vex (Security) | @infra Io (Infra)
+@nova Nova (Creative) | @reed Dr.Reed (Research) | @review Rila (Review)
+@flex Flex (Founder/MVP)
+
+## MCP Servers
+- apex-hands: node apex/src/hands-server.mjs
+- mirage-vfs: node apex/src/mirage-server.mjs
+- apex-composio: node apex/src/composio-server.mjs
+```
+</details>
+
+**Installs:** `.github/copilot-instructions.md`, `.copilot/plugin.json`, `.copilot/agents/` (10 `.md`), `.copilot/commands/` (8 `.md`)
+
+**Then:** `copilot plugin marketplace add @asno-dev/apex`
 
 ---
 
 ## ⌨️ Commands
-
-All APEX commands use the `apex-` prefix for clean namespacing — no collisions with built-in agent commands.
 
 | Command | Description |
 |:--------|:------------|
@@ -211,187 +585,55 @@ All APEX commands use the `apex-` prefix for clean namespacing — no collisions
 
 ---
 
-## 🧠 Skills
-
-APEX includes **25 pre-built skills** — composable, multi-step workflows that any agent can invoke.
-
-### Agent Skills (10)
-
-Each agent has its own core skill defining its persona, behavior, and domain rules:
-
-| Skill | Agent | Description |
-|:------|:------|:------------|
-| `apex-arch` | Max | System architecture, refactoring heuristics, blast radius mapping |
-| `apex-ui` | Zara | UI/UX design system, palette selection, component painting |
-| `apex-debug` | Kai | 5-step debug protocol, stack walking, guard injection |
-| `apex-perf` | Rex | Profiling, baseline capture, Big-O analysis |
-| `apex-sec` | Vex | OWASP scanning, secret detection, input tracing |
-| `apex-infra` | Io | Docker linting, k8s validation, CI/CD pipeline checks |
-| `apex-nova` | Nova | POC generation, library compass, trend analysis |
-| `apex-reed` | Dr. Reed | Evidence search, tradeoff matrices, complexity calculation |
-| `apex-review` | Rila | Diff categorization, anti-pattern detection, quality gates |
-| `apex-flex` | Flex | Value-cost scoring, MVP cutting, effort estimation |
-
-### Workflow Skills (15)
-
-Pre-composed multi-agent workflows for common engineering tasks:
-
-| Skill | Agents Used | Description |
-|:------|:------------|:------------|
-| `refactor` | @arch | Code compression and structural refactoring |
-| `ui-generate` | @ui | Generate UI components from descriptions |
-| `debug-protocol` | @debug | Full 5-step debugging workflow |
-| `perf-audit` | @perf | End-to-end performance audit |
-| `sec-review` | @sec | Security review with OWASP scoring |
-| `pr-review` | @review | Structured pull request review |
-| `system-design` | @arch, @reed | Architecture design with research backing |
-| `research` | @reed | Evidence-based technology research |
-| `mvp-cut` | @flex | MVP scoping and feature prioritization |
-| `full-stack-scaffold` | @arch → @ui → @infra | Complete app scaffolding pipeline |
-| `test-harness` | @debug | Test suite generation |
-| `bug-patch` | @debug → @review | Bug fix with review verification |
-| `requirements-to-spec` | @flex → @arch | Requirements analysis to technical spec |
-| `deploy-pipeline` | @infra | CI/CD pipeline generation |
-
----
-
 ## 🔧 MCP Servers
 
 APEX provides **3 MCP (Model Context Protocol) servers** with **56 purpose-built tools** across all 10 agents, plus **6 virtual filesystem tools** and **1000+ external tool bridges**.
 
 ### 1. apex-hands — 56 Agent Domain Tools
 
-The primary MCP server. 56 tools organized by agent domain:
-
-| Agent | Tools | Description |
-|:------|:------|:------------|
-| `@arch` | `blast_radius` `dep_graph` `complexity` `extract_refactor` `compose_check` `module_boundary` | Architecture analysis |
-| `@ui` | `contrast` `palette_extract` `a11y_audit` `responsive_test` `component_search` | UI/UX tooling |
-| `@debug` | `reproduce` `stack_walk` `log_mine` `bisect_run` `guard_inject` `var_watch` | Debugging instruments |
-| `@perf` | `profile` `memory_profile` `baseline_capture` `measure` `bundle_analyze` `big_o` | Performance profiling |
-| `@sec` | `vuln_scan` `secret_find` `input_trace` `auth_map` `owasp_score` `dependency_audit` | Security scanning |
-| `@infra` | `docker_lint` `k8s_validate` `ci_check` `deploy_dry` `rollback_plan` `health_check` | Infrastructure ops |
-| `@nova` | `poc_gen` `lib_compass` `alt_angle` `trend_sniff` `downside_check` `approach_matrix` | Creative exploration |
-| `@reed` | `compare` `complexity_calc` `evidence_search` `tradeoff_matrix` `recommend` | Research tools |
-| `@review` | `diff_cat` `anti_pattern` `quality_gate` `praise_find` `review_card` | Code review |
-| `@flex` | `value_cost` `mvp_cut` `risk_matrix` `roadmap` `effort_estimate` | Product management |
-
-**MCP Config:**
-```json
-{
-  "mcpServers": {
-    "apex-hands": {
-      "type": "local",
-      "command": ["node", "apex/src/hands-server.mjs"]
-    }
-  }
-}
-```
+| Agent | Tools |
+|:------|:------|
+| `@arch` | `blast_radius` `dep_graph` `complexity` `extract_refactor` `compose_check` `module_boundary` |
+| `@ui` | `contrast` `palette_extract` `a11y_audit` `responsive_test` `component_search` |
+| `@debug` | `reproduce` `stack_walk` `log_mine` `bisect_run` `guard_inject` `var_watch` |
+| `@perf` | `profile` `memory_profile` `baseline_capture` `measure` `bundle_analyze` `big_o` |
+| `@sec` | `vuln_scan` `secret_find` `input_trace` `auth_map` `owasp_score` `dependency_audit` |
+| `@infra` | `docker_lint` `k8s_validate` `ci_check` `deploy_dry` `rollback_plan` `health_check` |
+| `@nova` | `poc_gen` `lib_compass` `alt_angle` `trend_sniff` `downside_check` `approach_matrix` |
+| `@reed` | `compare` `complexity_calc` `evidence_search` `tradeoff_matrix` `recommend` |
+| `@review` | `diff_cat` `anti_pattern` `quality_gate` `praise_find` `review_card` |
+| `@flex` | `value_cost` `mvp_cut` `risk_matrix` `roadmap` `effort_estimate` |
 
 ### 2. mirage-vfs — Virtual Filesystem (50+ Backends)
 
 Unified filesystem across S3, GDrive, Slack, Redis, Postgres, and more.
 
-**MCP Config:**
-```json
-{
-  "mcpServers": {
-    "mirage-vfs": {
-      "type": "local",
-      "command": ["node", "apex/src/mirage-server.mjs"]
-    }
-  }
-}
-```
+**Setup:** `pip install mirage-ai && npm install -g @struktoai/mirage-cli`
 
 **Usage:**
 ```
 apex-mirage ls /s3/                    — List files in S3 bucket
 apex-mirage cp /gdrive/report.pdf /data/  — Copy from Google Drive
 apex-mirage grep -r error /s3/logs/    — Search across backends
-apex-mirage cat /slack/channel/messages  — Read Slack messages
 ```
-
-**Setup:** `pip install mirage-ai && npm install -g @struktoai/mirage-cli`
 
 ### 3. apex-composio — 1000+ External Tool Bridge
 
 Bridges Gmail, GitHub, Slack, Jira, Notion, and 1000+ more tools.
 
-**MCP Config:**
-```json
-{
-  "mcpServers": {
-    "apex-composio": {
-      "type": "local",
-      "command": ["node", "apex/src/composio-server.mjs"]
-    }
-  }
-}
-```
+**Setup:** `node apex/src/composio-setup.mjs`
+
+**Usage:** `@gmail send email` | `@github create PR` | `@slack post message`
 
 ### All 3 MCP Servers in One Config
 
-The root `.mcp.json` includes all three servers:
 ```json
 {
   "mcpServers": {
-    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"] },
-    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"] },
-    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"] }
+    "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
+    "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
+    "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
   }
-}
-```
-
----
-
-## 🔌 Composio Integration
-
-Connect **1000+ external tools** (Gmail, GitHub, Slack, Google Drive, Jira, Linear, Notion, and more) through [Composio](https://composio.dev).
-
-### Setup
-
-```bash
-# Interactive setup wizard
-node apex/src/composio-setup.mjs
-```
-
-The wizard will:
-1. Ask for your **Composio API key** (get one at [composio.dev](https://composio.dev))
-2. Let you select which tools to connect (gmail, github, slack, jira, etc.)
-3. Open an **OAuth link** in your browser for authorization
-4. Save the connection config to `.composio-config.json`
-
-### Status & Sync
-
-```bash
-node apex/src/composio-status.mjs          # Show all connected tools and their status
-node apex/src/composio-status.mjs --sync   # Force refresh tool definitions from backend
-```
-
-### Usage
-
-After connecting a tool, invoke it with `@toolName`:
-
-```
-@gmail send an email to the team about the release
-@github create a PR from feature branch
-@slack post build status to #deployments
-@jira create a ticket for this bug
-@notion update the architecture doc
-```
-
-### Configuration
-
-Stored at `.composio-config.json` (auto-added to `.gitignore` / `.npmignore`):
-
-```json
-{
-  "apiKey": "ak_your_api_key",
-  "userId": "your_user_id",
-  "connections": [
-    { "tool": "gmail", "label": "Gmail", "status": "ACTIVE", "authType": "OAUTH2" }
-  ]
 }
 ```
 
@@ -399,22 +641,19 @@ Stored at `.composio-config.json` (auto-added to `.gitignore` / `.npmignore`):
 
 ## 🔗 Agent Chains
 
-Agents can be chained for complex workflows:
-
-### Sequential Chains
+### Sequential
 ```
 Full app:        @arch → @ui → @infra      # Design → Paint → Deploy
 Bug patch:       @debug → @review           # Fix → Verify
 Spec to code:    @flex → @arch → @ui        # Scope → Design → Build
 ```
 
-### Parallel Chains
+### Parallel
 ```
 System design:   @arch ∥ @reed              # Architecture + Research in parallel
 ```
 
 ### Dynamic Peer Calling
-Any agent can call any peer mid-task:
 - `@perf` finds SQL injection → calls `@sec`
 - `@ui` needs a backend API → calls `@infra`
 - `@debug` finds performance issue → calls `@perf`
@@ -422,26 +661,7 @@ Any agent can call any peer mid-task:
 
 ---
 
-## 📄 Programmatic API
-
-Use APEX as a Node.js library:
-
-```javascript
-const apex = require('@asno-dev/apex');
-
-console.log(apex.version);          // "3.0.2"
-console.log(apex.agents);           // ['arch', 'ui', 'debug', 'perf', 'sec', 'infra', 'nova', 'reed', 'review', 'flex']
-console.log(apex.listAdapters());   // ['claude-code', 'cursor', 'opencode', 'cline', 'copilot', ...]
-
-const archSkill = apex.getSkill('arch');
-const cursorAdapter = apex.getAdapter('cursor');
-```
-
----
-
 ## 🎨 Design System (Zara)
-
-Zara's UI design system includes:
 
 - **10 curated palettes**: Trust, Energy, Authority, Clarity, Warmth, Midnight, Forest, Ocean, Aurora, Minimal
 - **CSS variable tokens** for all colors as `:root` variables
@@ -450,14 +670,12 @@ Zara's UI design system includes:
 - **WCAG AA** compliance (4.5:1 contrast ratio minimum)
 - **Mobile-first** responsive design
 - **200ms** max transition duration
-- **Skeleton loaders** for async content
 - **Semantic HTML** throughout
 
 ### Anti-Slop Rules
 - No decorative elements without purpose
 - No inline styles
 - No hardcoded hex colors
-- No lorem ipsum in production
 - No gradients without justification
 - No ALL CAPS text
 
@@ -470,26 +688,7 @@ Zara's UI design system includes:
 
 ### Zero Dependencies
 
-APEX has **zero production dependencies**. It uses only Node.js built-in modules:
-- ⚡ Instant install
-- 🔒 No supply chain risk
-- 📦 Tiny package size
-
----
-
-## 🤝 Contributing
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Guidelines
-- Follow the Core Laws in your contributions
-- Keep adapters in sync — run `npm test` before submitting
-- Add skills with proper YAML frontmatter
-- Document new tools in the appropriate `hands/*.mjs` module
+APEX has **zero production dependencies**. It uses only Node.js built-in modules.
 
 ---
 
@@ -505,15 +704,12 @@ npm test
 
 | Directory | Purpose |
 |:----------|:--------|
-| `adapters/` | Per-agent config files (16 agents) |
+| `adapters/` | Per-agent config files (12 agents) |
 | `agents/` | Canonical agent definitions (10 agents) |
 | `commands/` | Canonical command definitions (8 commands) |
 | `skills/` | SKILL.md files for orchestrator and agents |
 | `src/` | MCP servers and tool implementations |
-| `src/hands/` | Individual tool modules per agent |
 | `hooks/` | Lifecycle hooks for session management |
-| `scripts/` | Build and validation scripts |
-| `docs/` | Extended design documentation |
 | `bin/` | CLI entry point |
 
 ---
@@ -522,13 +718,7 @@ npm test
 
 [MIT](LICENSE) © [asno-dev](https://github.com/asno-dev)
 
----
-
-<p align="center">
-  Built with ⚡ by <a href="https://github.com/asno-dev">asno-dev</a>
-</p>
-
 <p align="center">
   <a href="https://x.com/LKanth9406">Follow on X</a> •
-  <a href="https://www.reddit.com/u/AdhesivenessTight914/s/Nxr1nHJM1b">Follow on Reddit</a>
+  <a href="https://github.com/asno-dev/apex">GitHub</a>
 </p>

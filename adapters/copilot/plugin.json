@@ -1,0 +1,45 @@
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "description": "APEX v2 — 10-agent senior engineering team for GitHub Copilot CLI. @arch architect, @ui UI, @debug debugging, @perf performance, @sec security, @infra infra, @nova creative, @reed research, @review review, @flex MVP. 3 MCP servers, Composio, Mirage VFS, OfficeCLI.",
+  "author": "asno-dev",
+  "mcpServers": {
+    "apex-hands": {
+      "type": "local",
+      "command": ["node", "src/hands-server.mjs"],
+      "description": "56 domain tools for all 10 agents"
+    },
+    "mirage-vfs": {
+      "type": "local",
+      "command": ["node", "src/mirage-server.mjs"],
+      "description": "Virtual filesystem across 50+ backends"
+    },
+    "apex-composio": {
+      "type": "local",
+      "command": ["node", "src/composio-server.mjs"],
+      "description": "Bridge to 1000+ external tools via Composio"
+    }
+  },
+  "agents": [
+    {"name": "arch", "tag": "@arch", "role": "Architect"},
+    {"name": "ui", "tag": "@ui", "role": "UI/UX Designer"},
+    {"name": "debug", "tag": "@debug", "role": "Debugger"},
+    {"name": "perf", "tag": "@perf", "role": "Performance Engineer"},
+    {"name": "sec", "tag": "@sec", "role": "Security Engineer"},
+    {"name": "infra", "tag": "@infra", "role": "Infrastructure Engineer"},
+    {"name": "nova", "tag": "@nova", "role": "Creative"},
+    {"name": "reed", "tag": "@reed", "role": "Researcher"},
+    {"name": "review", "tag": "@review", "role": "Reviewer"},
+    {"name": "flex", "tag": "@flex", "role": "Founder/PM"}
+  ],
+  "commands": ["apex", "apex-docs", "apex-excel", "apex-ppt", "apex-composio-setup", "apex-composio-status", "apex-composio-sync", "apex-mirage"],
+  "features": {
+    "agents": true,
+    "commands": true,
+    "mcpServers": true,
+    "composio": true,
+    "mirage": true,
+    "officecli": true,
+    "modes": ["direct", "team", "select"]
+  }
+}

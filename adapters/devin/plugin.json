@@ -1,0 +1,55 @@
+{
+  "name": "apex",
+  "version": "2.0.0",
+  "description": "APEX v2 — 10-agent senior engineering team. Routes to @arch, @ui, @debug, @perf, @sec, @infra, @nova, @reed, @review, @flex. 56 MCP tools, Composio (1000+), Mirage VFS (50+ backends), OfficeCLI.",
+  "author": "asno-dev",
+  "hooks": {},
+  "mcpServers": {
+    "apex-hands": {
+      "type": "local",
+      "command": ["node", "src/hands-server.mjs"]
+    },
+    "mirage-vfs": {
+      "type": "local",
+      "command": ["node", "src/mirage-server.mjs"]
+    },
+    "apex-composio": {
+      "type": "local",
+      "command": ["node", "src/composio-server.mjs"]
+    }
+  },
+  "agents": [
+    {"name": "arch", "file": "agents/arch.md", "tag": "@arch", "role": "Architect"},
+    {"name": "ui", "file": "agents/ui.md", "tag": "@ui", "role": "UI/UX Designer"},
+    {"name": "debug", "file": "agents/debug.md", "tag": "@debug", "role": "Debugger"},
+    {"name": "perf", "file": "agents/perf.md", "tag": "@perf", "role": "Performance Engineer"},
+    {"name": "sec", "file": "agents/sec.md", "tag": "@sec", "role": "Security Engineer"},
+    {"name": "infra", "file": "agents/infra.md", "tag": "@infra", "role": "Infrastructure Engineer"},
+    {"name": "nova", "file": "agents/nova.md", "tag": "@nova", "role": "Creative Technologist"},
+    {"name": "reed", "file": "agents/reed.md", "tag": "@reed", "role": "Researcher"},
+    {"name": "review", "file": "agents/review.md", "tag": "@review", "role": "Reviewer"},
+    {"name": "flex", "file": "agents/flex.md", "tag": "@flex", "role": "Founder/PM"}
+  ],
+  "commands": [
+    {"name": "apex", "file": "commands/apex.md"},
+    {"name": "apex-docs", "file": "commands/apex-docs.md"},
+    {"name": "apex-excel", "file": "commands/apex-excel.md"},
+    {"name": "apex-ppt", "file": "commands/apex-ppt.md"},
+    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.md"},
+    {"name": "apex-composio-status", "file": "commands/apex-composio-status.md"},
+    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.md"},
+    {"name": "apex-mirage", "file": "commands/apex-mirage.md"}
+  ],
+  "features": {
+    "agents": true,
+    "commands": true,
+    "mcpServers": true,
+    "composio": true,
+    "mirage": true,
+    "officecli": true,
+    "modes": ["direct", "team", "select"],
+    "routing": true,
+    "dynamicActivation": true,
+    "crossDelegation": true
+  }
+}
