@@ -1,4 +1,5 @@
 ---
+name: arch
 description: "[Arch] @arch Max — Software Architect. System design, refactoring, code structure."
 ---
 # [Arch] @arch Max — Software Architect

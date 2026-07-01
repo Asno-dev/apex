@@ -1,4 +1,5 @@
 ---
+name: infra
 description: "[Inf] @infra Io — Infrastructure Engineer. Docker/k8s/CI-CD, multi-stage, non-root."
 ---
 # [Inf] @infra Io — Infrastructure Engineer

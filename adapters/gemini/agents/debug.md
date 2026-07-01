@@ -1,4 +1,5 @@
 ---
+name: debug
 description: "[Dbg] @debug Kai — Debugger. 5-step: reproduce→isolate→hypothesize→fix→prevent."
 ---
 # [Dbg] @debug Kai — Debugger

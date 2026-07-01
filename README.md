@@ -215,7 +215,7 @@ npx @asno-dev/apex gemini
 ```
 
 <details>
-<summary><strong>.gemini/gemini-extension.json</strong> — 10 agents, 8 commands, 3 MCP servers</summary>
+<summary><strong>.gemini/gemini-extension.json</strong> — 8 commands, 3 MCP servers (agents auto-discovered from <code>.gemini/agents/*.md</code>)</summary>
 
 ```json
 {
@@ -226,20 +226,9 @@ npx @asno-dev/apex gemini
     "mirage-vfs": { "command": "node apex/src/mirage-server.mjs", "type": "local" },
     "apex-composio": { "command": "node apex/src/composio-server.mjs", "type": "local" }
   },
-  "agents": [
-    {"name": "arch", "file": "agents/arch.md", "tag": "@arch"},
-    {"name": "ui", "file": "agents/ui.md", "tag": "@ui"},
-    {"name": "debug", "file": "agents/debug.md", "tag": "@debug"},
-    {"name": "perf", "file": "agents/perf.md", "tag": "@perf"},
-    {"name": "sec", "file": "agents/sec.md", "tag": "@sec"},
-    {"name": "infra", "file": "agents/infra.md", "tag": "@infra"},
-    {"name": "nova", "file": "agents/nova.md", "tag": "@nova"},
-    {"name": "reed", "file": "agents/reed.md", "tag": "@reed"},
-    {"name": "review", "file": "agents/review.md", "tag": "@review"},
-    {"name": "flex", "file": "agents/flex.md", "tag": "@flex"}
-  ],
   "commands": [
     {"name": "apex", "file": "commands/apex.md"},
+    {"name": "apex-team", "file": "commands/apex.md"},
     {"name": "apex-docs", "file": "commands/apex-docs.md"},
     {"name": "apex-excel", "file": "commands/apex-excel.md"},
     {"name": "apex-ppt", "file": "commands/apex-ppt.md"},
