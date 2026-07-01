@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/agents-10-blueviolet?style=flat-square" alt="agents" />
   <img src="https://img.shields.io/badge/tools-56-orange?style=flat-square" alt="tools" />
   <img src="https://img.shields.io/badge/skills-25-teal?style=flat-square" alt="skills" />
-  <img src="https://img.shields.io/badge/adapters-16-blue?style=flat-square" alt="adapters" />
+   <img src="https://img.shields.io/badge/adapters-7-blue?style=flat-square" alt="adapters" />
   <img src="https://img.shields.io/badge/node-%3E%3D18-green?style=flat-square" alt="node" />
 </p>
 
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  A zero-dependency orchestrator that routes your requests to 10 specialist AI agents — each with domain expertise, purpose-built tools, and the ability to dynamically call peers mid-task. Works with <strong>16+ coding agents</strong> out of the box.
+  A zero-dependency orchestrator that routes your requests to 10 specialist AI agents — each with domain expertise, purpose-built tools, and the ability to dynamically call peers mid-task. Works with <strong>7 coding agents</strong> out of the box.
 </p>
 
 <p align="center">
@@ -36,15 +36,10 @@
 ## 🚀 Quick Start
 
 ```bash
-# Run interactive installer — detects your agents, lets you pick
-npx @asno-dev/apex
-
-# Or install globally first
-npm install -g @asno-dev/apex
 npx @asno-dev/apex
 ```
 
-The installer detects your coding agents, shows a picker, and configures everything automatically.
+The installer detects your coding agents and configures everything — MCP servers, agents, commands, skills.
 
 That's it. Now talk to your coding agent:
 
@@ -167,69 +162,35 @@ Activate only specific agents for a focused session.
 
 ## 📦 Installation
 
-APEX supports **16+ coding agents** with dedicated adapters for each.
-
-### Quick Install (Recommended)
+APEX supports **7 coding agents** — run once and everything is configured.
 
 ```bash
 npx @asno-dev/apex
 ```
 
-The installer:
-1. **Detects** your installed coding agents automatically
-2. **Shows picker** — ↑↓ navigate, **Space** toggle, **Enter** confirm
-3. **Installs** all APEX files into `apex/` + agent configs at project root
-4. **Fixes MCP paths** so `@arch`, `@ui`, `@debug` etc. work out of the box
+The installer auto-detects your agents and installs all APEX files into `apex/` + per-agent configs at the project root.
 
-### Options
+| Agent | Installed Files | `@arch` Works | MCP | Commands |
+|:------|:----------------|:-------------:|:---:|:--------:|
+| **Claude Code** | `.claude/plugin.json` + agents + commands + hooks | ✅ Native subagents | ✅ 3 servers | ✅ 8 commands |
+| **Gemini CLI** | `.gemini/extension.json` + agents + commands | ✅ Extension agents | ✅ 3 servers | ✅ 8 commands |
+| **Codex CLI** | `.codex/plugin.json` + mcp.toml + agents + skills | ✅ Native subagents | ✅ 3 servers | ✅ skills |
+| **OpenCode** | `opencode.json` + plugin + `.opencode/agents/` | ✅ Native agents | ✅ 3 servers | ✅ via plugin |
+| **Cursor** | `.cursor/mcp.json` + rules + agents + commands | ✅ Rule-based | ✅ 3 servers | ✅ 8 commands |
+| **Antigravity** | `antigravity-extension.json` + `AGENTS.md` | ✅ Extension agents | ✅ 3 servers | ✅ via extension |
+| **Cline / Kilo** | `.cline/mcp.json` + rules + agents + commands + `.clinerules` | ✅ Rule-based | ✅ 3 servers | ✅ 8 commands |
 
-```bash
-npx @asno-dev/apex              # Interactive picker (default)
-npx @asno-dev/apex --yes        # Auto-install for all detected agents
-```
+### Verify
 
-### Per-Agent Installation Details
-
-| Agent | What Gets Installed | How to Use APEX |
-|:------|:--------------------|:----------------|
-| **Claude Code** | `.claude/plugin.json` + `.claude/agents/*.md` + `.claude/commands/*.md` | `@arch` works natively via subagents |
-| **Codex CLI** | `.codex/plugin.json` + `.codex/mcp.toml` + `.codex/agents/*.toml` | `@arch` works natively via subagents |
-| **Gemini CLI** | `.gemini/extension.json` + `.gemini/agents/*.md` + `.gemini/commands/*.toml` | `@arch` works natively via extension agents |
-| **OpenCode** | `opencode.json` + `adapters/opencode/apex.mjs` + `.opencode/agents/*.md` | `@arch` works natively via agents |
-| **Cursor** | `.cursor/mcp.json` + `.cursor/rules/apex.mdc` | MCP servers + rule-based routing |
-| **Windsurf** | `.windsurf/mcp.json` + `.windsurf/rules/apex.md` + `.windsurf/workflows/` | MCP servers + rule-based routing |
-| **Antigravity** | `antigravity-extension.json` + `AGENTS.md` | Extension with MCP servers |
-| **Cline / Kilo** | `.clinerules` (project root) | Instructions loaded as system prompt |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | Copilot instructions |
-| **Devin** | `.devin/plugin.yaml` + `.devin/mcp.json` + `.devin/agents/*/AGENT.md` | Plugin with MCP + agent files |
-| **Hermes** | `.hermes/plugin.yaml` + `hermes-apex.yaml` | Plugin with skills |
-| **Pi Agent** | `pi-extension.json` + `AGENTS.md` | Extension with MCP servers |
-| **Kiro** | `.kiro/steering/apex.md` | Steering prompt |
-| **OpenClaw** | `openclaw-package.json` + `openclaw-apex.md` | Package config + skill |
-| **CodeWhale** | `AGENTS.md` | Agent instructions |
-| **Swival** | `swival-apex-skill.md` + `.swival/mcp.json` | Skill file + MCP servers |
-
-### Universal Files (Installed for Every Agent)
-
-| File | Location | Purpose |
-|:-----|:---------|:--------|
-| `apex/` | Project root (`./apex/`) | All APEX source files — MCP servers, skills, agents, commands |
-| `apex/src/` | `./apex/src/` | MCP server implementations (hands-server, mirage-server, composio-server) |
-| `apex/skills/` | `./apex/skills/` | 25 skill files for all 10 agents |
-| `apex/AGENTS.md` | `./apex/AGENTS.md` | 10-agent team documentation |
-| `.mcp.json` | Project root | 3 MCP servers with paths fixed to `apex/src/` |
-| `AGENTS.md` | Project root | Agent instructions (aggressive caching) |
-
-### Verify Installation
-
-After installing, verify APEX is loaded:
-
-- **Claude Code**: Run `claude` — type `@arch` and see Max respond
-- **Codex CLI**: Run `codex` — type `@arch` and see Max respond
-- **Gemini CLI**: Run `gemini` — type `@arch` and see Max respond  
-- **OpenCode**: Run `opencode` — type `@arch` and see Max respond
-- **Cursor**: Open project — rules and MCP servers are active
-- **Windsurf**: Open project — rules and MCP servers are active
+| Agent | Command |
+|:------|:--------|
+| **Claude Code** | `claude` → type `@arch` → Max responds |
+| **Codex CLI** | `codex` → type `@arch` → Max responds |
+| **Gemini CLI** | `gemini` → type `@arch` → Max responds |
+| **OpenCode** | `opencode` → type `@arch` → Max responds |
+| **Cursor** | Open project — MCP servers + rules active |
+| **Cline / Kilo** | Open project — MCP servers + rules active |
+| **Antigravity** | `agy` → type `@arch` → Max responds |
 
 ---
 

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "apex-hands": {
+      "type": "local",
+      "command": ["node", "apex/src/hands-server.mjs"]
+    },
+    "mirage-vfs": {
+      "type": "local",
+      "command": ["node", "apex/src/mirage-server.mjs"]
+    },
+    "apex-composio": {
+      "type": "local",
+      "command": ["node", "apex/src/composio-server.mjs"]
+    }
+  }
+}
