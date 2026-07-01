@@ -174,7 +174,7 @@ npx @asno-dev/apex claude-code
 
 **Installs:** `.claude/plugin.json`, `.claude/hooks.json`, `.claude/agents/` (10), `.claude/commands/` (8), `.claude/hooks/` (4)
 
-**Then in Claude Code:** `/plugin update`
+**Then:** `claude plugin install .claude`
 
 ---
 
@@ -204,7 +204,7 @@ npx @asno-dev/apex codex
 
 **Installs:** `.codex/plugin.json`, `.codex/mcp.toml`, `.codex/agents/` (10 `.toml`), `.codex/SKILLS.md`
 
-**Then in Codex:** `codex plugin update`
+**Codex auto-loads** `.codex/plugin.json` on startup. If not, run: `codex plugin add apex`
 
 ---
 
@@ -255,7 +255,7 @@ npx @asno-dev/apex gemini
 
 **Installs:** `.gemini/extension.json`, `.gemini/agents/` (10 `.md`), `.gemini/commands/` (8 `.toml`), `AGENTS.md`
 
-**Then:** `gemini extensions install`
+**Gemini auto-detects** `.gemini/extension.json` on startup. If not, run: `gemini extensions install .gemini`
 
 ---
 
@@ -281,7 +281,7 @@ npx @asno-dev/apex cursor
 
 **Installs:** `.cursor/mcp.json`, `.cursor/rules/apex.mdc`, `.cursor/agents/` (10 `.mdc`), `.cursor/commands/` (8 `.md`)
 
-**Zero setup** — Cursor loads rules + MCP automatically on project open.
+**Auto-detects** — Cursor loads `.cursor/mcp.json` and `.cursor/rules/apex.mdc` on project open. Zero setup.
 
 ---
 
@@ -307,6 +307,8 @@ npx @asno-dev/apex cline
 
 **Installs:** `.cline/mcp.json`, `.cline/rules/apex.mdc`, `.cline/agents/` (10 `.mdc`), `.cline/commands/` (8 `.md`), `.clinerules`
 
+**Auto-detects** — Cline loads `.cline/` config on project open. Zero setup.
+
 ---
 
 ### OpenCode
@@ -331,6 +333,8 @@ npx @asno-dev/apex opencode
 </details>
 
 **Installs:** `opencode.json`, `adapters/opencode/apex.mjs`, `.opencode/agents/` (10)
+
+**Auto-detects** — OpenCode loads `opencode.json` and `.opencode/agents/` on startup. Zero setup.
 
 ---
 
@@ -373,7 +377,7 @@ npx @asno-dev/apex antigravity
 
 **Installs:** `antigravity-extension.json`, `AGENTS.md`
 
-**Then:** `agy plugin install`
+**Auto-detects** — Antigravity scans for `antigravity-extension.json` on startup. Zero setup.
 
 ---
 
@@ -423,7 +427,7 @@ npx @asno-dev/apex devin
 
 **Installs:** `.devin/plugin.json`, `.devin/agents/` (10 `.md`), `.devin/commands/` (8 `.md`)
 
-**Then:** `devin plugins install`
+**Auto-detects** — Devin reads `.devin/` config on startup. Zero setup.
 
 ---
 
@@ -473,7 +477,7 @@ npx @asno-dev/apex hermes
 
 **Installs:** `.hermes/plugin.json`, `.hermes/agents/` (10 `.md`), `.hermes/commands/` (8 `.md`)
 
-**Then:** `hermes plugins install apex --enable`
+**Then:** `hermes plugins install apex`
 
 ---
 
@@ -507,7 +511,7 @@ npx @asno-dev/apex pi
 
 **Installs:** `.pi/package.json`, `.pi/index.js`, `.pi/agents/` (10 `.md`), `.pi/commands/` (8 `.md`)
 
-**Then:** `pi install .`
+**Auto-detects** — Pi loads `.pi/` extensions on project trust. Zero setup.
 
 ---
 
@@ -536,7 +540,7 @@ npx @asno-dev/apex openclaw
 
 **Installs:** `.openclaw/skills/manifest.json`, `.openclaw/skills/` (10), `.openclaw/commands/` (8 `.md`)
 
-**Then:** `clawhub install apex`
+**Auto-detects** — OpenClaw loads `.openclaw/skills/` on project open. Zero setup.
 
 ---
 
@@ -566,7 +570,7 @@ npx @asno-dev/apex copilot
 
 **Installs:** `.github/copilot-instructions.md`, `.copilot/plugin.json`, `.copilot/agents/` (10 `.md`), `.copilot/commands/` (8 `.md`)
 
-**Then:** `copilot plugin marketplace add @asno-dev/apex`
+**Then:** `copilot plugin marketplace add asno-dev/apex` then `copilot plugin install apex`
 
 ---
 
@@ -592,7 +596,7 @@ npx @asno-dev/apex kilocode
 
 **Installs:** `.kilo/mcp.json`, `.kilo/steering/apex.md`, `.kilo/agents/` (10 `.md`), `.kilo/commands/` (8 `.md`)
 
-**Then:** KiloCode loads steering + agents + MCP automatically on project open.
+**Auto-detects** — KiloCode loads `.kilo/` config on project open. Zero setup.
 
 ---
 

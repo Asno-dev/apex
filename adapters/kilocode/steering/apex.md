@@ -30,6 +30,13 @@ code/refactor→@arch | UI→@ui | bugs→@debug | perf→@perf | security→@se
 deploy/CI→@infra | ideas→@nova | research→@reed | review→@review | scope→@flex
 full-app→@arch→@ui→@infra | patch→@debug→@review
 
+## Commands
+- `/apex team` — Team mode (default). Routes to best agent, agents call peers.
+- `/apex select a,b` — Select mode. Only listed agents active.
+- `/apex off` — Disable APEX.
+- `/apex status` — Show mode + active agents.
+- `/apex help` — Show help.
+
 ## MCP Servers
 1. apex-hands — 56 tools. node apex/src/hands-server.mjs
 2. mirage-vfs — 50+ backends. node apex/src/mirage-server.mjs
