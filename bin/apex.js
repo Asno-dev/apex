@@ -38,6 +38,7 @@ const AGENTS = [
   { id: 'cursor', dir: '.cursor', label: 'Cursor', install: 'npx @asno-dev/apex cursor' },
   { id: 'opencode', dir: '.opencode', label: 'OpenCode', install: 'npx @asno-dev/apex opencode' },
   { id: 'cline', dir: '.cline', label: 'Cline / Kilo', install: 'npx @asno-dev/apex cline' },
+  { id: 'kilocode', dir: '.kilo', label: 'KiloCode / Kiro', install: 'npx @asno-dev/apex kilocode' },
   { id: 'devin', dir: '', label: 'Devin CLI', install: 'npx @asno-dev/apex devin' },
   { id: 'hermes', dir: '', label: 'Hermes Agent', install: 'npx @asno-dev/apex hermes' },
   { id: 'pi', dir: '', label: 'Pi Agent Harness', install: 'npx @asno-dev/apex pi' },
@@ -48,7 +49,7 @@ const AGENTS = [
 const installers = {
   // ── Plugin-based (full feature support) ──
   'claude-code': () => {
-    const d = path.join(CWD, '.claude'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands')); mkdir(path.join(d, 'hooks'));
+    const d = path.join(CWD, '.claude'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands')); mkdir(path.join(d, 'hooks'));
     copyFixed(path.join(ROOT, 'adapters/claude-code/plugin.json'), path.join(d, 'plugin.json'));
     copy(path.join(ROOT, 'adapters/claude-code/hooks.json'), path.join(d, 'hooks.json'));
     copyDir(path.join(ROOT, 'hooks'), path.join(d, 'hooks'));
@@ -57,7 +58,7 @@ const installers = {
     return true;
   },
   'gemini': () => {
-    const d = path.join(CWD, '.gemini'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.gemini'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
     copyFixed(path.join(ROOT, 'adapters/gemini/extension.json'), path.join(d, 'extension.json'));
     copy(path.join(ROOT, 'AGENTS.md'), path.join(d, 'AGENTS.md'));
     copyDir(path.join(ROOT, 'adapters/gemini/agents'), path.join(d, 'agents'));
@@ -65,7 +66,7 @@ const installers = {
     return true;
   },
   'codex': () => {
-    const d = path.join(CWD, '.codex'); mkdir(path.join(d, 'agents'));
+    const d = path.join(CWD, '.codex'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents'));
     copyFixed(path.join(ROOT, 'adapters/codex/plugin.json'), path.join(d, 'plugin.json'));
     copyFixed(path.join(ROOT, 'adapters/codex/mcp.toml'), path.join(d, 'mcp.toml'));
     copy(path.join(ROOT, 'adapters/codex/SKILLS.md'), path.join(d, 'SKILLS.md'));
@@ -73,6 +74,8 @@ const installers = {
     return true;
   },
   'opencode': () => {
+    const agentsTarget = path.join(CWD, '.opencode/agents');
+    if (fs.existsSync(agentsTarget)) fs.rmSync(agentsTarget, { recursive: true, force: true });
     copyFixed(path.join(ROOT, 'opencode.json'), path.join(CWD, 'opencode.json'));
     const plugin = path.join(ROOT, 'adapters/opencode/apex.mjs');
     if (fs.existsSync(plugin)) copy(plugin, path.join(CWD, 'adapters/opencode/apex.mjs'));
@@ -82,7 +85,7 @@ const installers = {
   },
   // ── Rule-based (MCP + rules) ──
   'cursor': () => {
-    const d = path.join(CWD, '.cursor'); mkdir(path.join(d, 'rules')); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.cursor'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'rules')); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
     copyFixed(path.join(ROOT, '.mcp.json'), path.join(d, 'mcp.json'));
     copy(path.join(ROOT, 'adapters/cursor/rules/apex.mdc'), path.join(d, 'rules/apex.mdc'));
     copyDir(path.join(ROOT, 'adapters/cursor/agents'), path.join(d, 'agents'));
@@ -90,7 +93,7 @@ const installers = {
     return true;
   },
   'cline': () => {
-    const d = path.join(CWD, '.cline'); mkdir(path.join(d, 'rules')); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.cline'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'rules')); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
     copyFixed(path.join(ROOT, 'adapters/cline/mcp.json'), path.join(d, 'mcp.json'));
     copy(path.join(ROOT, 'adapters/cline/rules/apex.mdc'), path.join(d, 'rules/apex.mdc'));
     copyDir(path.join(ROOT, 'adapters/cline/agents'), path.join(d, 'agents'));
@@ -99,27 +102,29 @@ const installers = {
     return true;
   },
   'antigravity': () => {
+    const files = ['antigravity-extension.json'];
+    files.forEach(f => { const p = path.join(CWD, f); if (fs.existsSync(p)) fs.rmSync(p); });
     const src = path.join(ROOT, 'adapters/antigravity/extension.json');
     if (fs.existsSync(src)) copyFixed(src, path.join(CWD, 'antigravity-extension.json'));
     copy(path.join(ROOT, 'AGENTS.md'), path.join(CWD, 'AGENTS.md'));
     return true;
   },
   'devin': () => {
-    const d = path.join(CWD, '.devin'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.devin'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
     copyFixed(path.join(ROOT, 'adapters/devin/plugin.json'), path.join(d, 'plugin.json'));
     copyDir(path.join(ROOT, 'adapters/devin/agents'), path.join(d, 'agents'));
     copyDir(path.join(ROOT, 'adapters/devin/commands'), path.join(d, 'commands'));
     return true;
   },
   'hermes': () => {
-    const d = path.join(CWD, '.hermes'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.hermes'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
     copyFixed(path.join(ROOT, 'adapters/hermes/plugin.json'), path.join(d, 'plugin.json'));
     copyDir(path.join(ROOT, 'adapters/hermes/agents'), path.join(d, 'agents'));
     copyDir(path.join(ROOT, 'adapters/hermes/commands'), path.join(d, 'commands'));
     return true;
   },
   'pi': () => {
-    const d = path.join(CWD, '.pi'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.pi'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
     copy(path.join(ROOT, 'adapters/pi/package.json'), path.join(d, 'package.json'));
     copy(path.join(ROOT, 'adapters/pi/index.js'), path.join(d, 'index.js'));
     copyDir(path.join(ROOT, 'adapters/pi/agents'), path.join(d, 'agents'));
@@ -127,19 +132,32 @@ const installers = {
     return true;
   },
   'openclaw': () => {
-    const d = path.join(CWD, '.openclaw'); mkdir(path.join(d, 'skills')); mkdir(path.join(d, 'commands'));
+    const d = path.join(CWD, '.openclaw'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true }); mkdir(path.join(d, 'skills')); mkdir(path.join(d, 'commands'));
     copyDir(path.join(ROOT, 'adapters/openclaw/skills'), path.join(d, 'skills'));
     copyDir(path.join(ROOT, 'adapters/openclaw/commands'), path.join(d, 'commands'));
     return true;
   },
   'copilot': () => {
     const copilotDir = path.join(CWD, '.github');
+    const copilotFile = path.join(copilotDir, 'copilot-instructions.md');
+    if (fs.existsSync(copilotFile)) fs.rmSync(copilotFile);
+    const d = path.join(CWD, '.copilot'); if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true });
     mkdir(copilotDir);
     copy(path.join(ROOT, 'adapters/copilot/copilot-instructions.md'), path.join(copilotDir, 'copilot-instructions.md'));
-    const d = path.join(CWD, '.copilot'); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
     copyFixed(path.join(ROOT, 'adapters/copilot/plugin.json'), path.join(d, 'plugin.json'));
     copyDir(path.join(ROOT, 'adapters/copilot/agents'), path.join(d, 'agents'));
     copyDir(path.join(ROOT, 'adapters/copilot/commands'), path.join(d, 'commands'));
+    return true;
+  },
+  'kilocode': () => {
+    const d = path.join(CWD, '.kilo');
+    if (fs.existsSync(d)) fs.rmSync(d, { recursive: true, force: true });
+    mkdir(path.join(d, 'steering')); mkdir(path.join(d, 'agents')); mkdir(path.join(d, 'commands'));
+    copyFixed(path.join(ROOT, 'adapters/kilocode/mcp.json'), path.join(d, 'mcp.json'));
+    copy(path.join(ROOT, 'adapters/kilocode/steering/apex.md'), path.join(d, 'steering/apex.md'));
+    copyDir(path.join(ROOT, 'adapters/kilocode/agents'), path.join(d, 'agents'));
+    copyDir(path.join(ROOT, 'adapters/kilocode/commands'), path.join(d, 'commands'));
     return true;
   },
 };

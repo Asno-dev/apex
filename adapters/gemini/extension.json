@@ -16,14 +16,14 @@
     {"name": "flex", "file": "agents/flex.md", "tag": "@flex", "role": "Founder/Product Strategist"}
   ],
   "commands": [
-    {"name": "apex", "file": "commands/apex.toml"},
-    {"name": "apex-docs", "file": "commands/apex-docs.toml"},
-    {"name": "apex-excel", "file": "commands/apex-excel.toml"},
-    {"name": "apex-ppt", "file": "commands/apex-ppt.toml"},
-    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.toml"},
-    {"name": "apex-composio-status", "file": "commands/apex-composio-status.toml"},
-    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.toml"},
-    {"name": "apex-mirage", "file": "commands/apex-mirage.toml"}
+    {"name": "apex", "file": "commands/apex.md"},
+    {"name": "apex-docs", "file": "commands/apex-docs.md"},
+    {"name": "apex-excel", "file": "commands/apex-excel.md"},
+    {"name": "apex-ppt", "file": "commands/apex-ppt.md"},
+    {"name": "apex-composio-setup", "file": "commands/apex-composio-setup.md"},
+    {"name": "apex-composio-status", "file": "commands/apex-composio-status.md"},
+    {"name": "apex-composio-sync", "file": "commands/apex-composio-sync.md"},
+    {"name": "apex-mirage", "file": "commands/apex-mirage.md"}
   ],
   "mcpServers": {
     "apex-hands": {
