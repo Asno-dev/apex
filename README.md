@@ -30,14 +30,13 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
-npx @asno-dev/apex                       # Install shared APEX files (apex/ folder)
-npx @asno-dev/apex claude-code            # Install for your coding agent
+npx @asno-dev/apex <agent>   # Replace <agent> with your coding agent (see below)
 ```
 
-No auto-detection. No interactive prompts. You pick your agent, one command.
+One command. Installs shared files, agent configs, MCP servers, and commands.
 
 Then use `@agentName` in your coding agent:
 
@@ -56,7 +55,7 @@ Then use `@agentName` in your coding agent:
 
 ---
 
-## 🤖 Agents
+## Agents
 
 APEX ships with **10 specialist agents**, each with a unique persona, domain expertise, and set of purpose-built tools.
 
@@ -104,48 +103,9 @@ APEX ships with **10 specialist agents**, each with a unique persona, domain exp
 
 ---
 
-## 📦 Installation
+## Installation
 
-No auto-detection. No interactive picker. Three steps:
-
-### 1. Install shared APEX files
-
-```bash
-npx @asno-dev/apex
-```
-
-Creates `apex/` in your project with MCP servers, skills, agent definitions, and commands.
-
-### 2. Copy the MCP config
-
-<details>
-<summary><strong>.mcp.json</strong> — 3 MCP servers: apex-hands (56 tools), mirage-vfs (50+ backends), apex-composio (1000+ tools)</summary>
-
-```json
-{
-  "mcpServers": {
-    "apex-hands": {
-      "command": ["node", "apex/src/hands-server.mjs"],
-      "type": "local"
-    },
-    "mirage-vfs": {
-      "command": ["node", "apex/src/mirage-server.mjs"],
-      "type": "local"
-    },
-    "apex-composio": {
-      "command": ["node", "apex/src/composio-server.mjs"],
-      "type": "local"
-    }
-  }
-}
-```
-</details>
-
-### 3. Install for your coding agent
-
-Choose your agent below. Each section shows the one-liner install and the files it creates.
-
----
+One command per agent. No auto-detection, no interactive prompts.
 
 ### Claude Code
 
@@ -159,7 +119,7 @@ npx @asno-dev/apex claude-code
 ```json
 {
   "name": "apex",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "hooks": "./hooks.json",
   "mcpServers": {
     "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
@@ -172,9 +132,9 @@ npx @asno-dev/apex claude-code
 ```
 </details>
 
-**Installs:** `.claude/plugin.json`, `.claude/hooks.json`, `.claude/agents/` (10), `.claude/commands/` (8), `.claude/hooks/` (4)
+**Installs:** `.claude/plugin.json`, `.claude/hooks.json`, `.claude/agents/` (10 `.md`), `.claude/commands/` (8 `.md`), `.claude/hooks/` (4)
 
-**Then:** `claude plugin install .claude`
+**Auto-detects** — Claude Code loads `.claude/plugin.json` on startup.
 
 ---
 
@@ -185,7 +145,7 @@ npx @asno-dev/apex codex
 ```
 
 <details>
-<summary><strong>.codex/plugin.json</strong> — 10 subagents, 3 MCP servers, skills</summary>
+<summary><strong>.codex/</strong> — plugin.json, codex.json, config.toml, 10 agents, 9 commands, plugins/apex.json</summary>
 
 ```json
 {
@@ -197,14 +157,16 @@ npx @asno-dev/apex codex
     "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
   },
   "subagents": ["agents/arch.toml", "agents/ui.toml", "agents/debug.toml", "agents/perf.toml", "agents/sec.toml", "agents/infra.toml", "agents/nova.toml", "agents/reed.toml", "agents/review.toml", "agents/flex.toml"],
-  "commands": ["apex", "apex-docs", "apex-excel", "apex-ppt", "apex-composio-setup", "apex-composio-status", "apex-composio-sync", "apex-mirage"]
+  "commands": ["commands/apex.md", "commands/apex-team.md", "commands/apex-docs.md", "commands/apex-excel.md", "commands/apex-ppt.md", "commands/apex-composio-setup.md", "commands/apex-composio-status.md", "commands/apex-composio-sync.md", "commands/apex-mirage.md"]
 }
 ```
 </details>
 
-**Installs:** `.codex/plugin.json`, `.codex/mcp.toml`, `.codex/agents/` (10 `.toml`), `.codex/SKILLS.md`, `commands/apex.md`
+**Installs:** `.codex/plugin.json`, `.codex/codex.json`, `.codex/config.toml`, `.codex/plugins/apex.json`, `.codex/agents/` (10 `.toml`), `.codex/commands/` (9 `.md`), `.codex/SKILLS.md`
 
-**Codex auto-loads** `.codex/plugin.json` on startup. Zero setup.
+**Auto-detects** — Codex CLI loads `.codex/plugin.json` on startup (v0.142+).
+
+**Prerequisite:** `npm install -g @openai/codex` (v0.142.5+)
 
 ---
 
@@ -220,7 +182,7 @@ npx @asno-dev/apex gemini
 ```json
 {
   "name": "apex",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "mcpServers": {
     "apex-hands": { "command": "node apex/src/hands-server.mjs", "type": "local" },
     "mirage-vfs": { "command": "node apex/src/mirage-server.mjs", "type": "local" },
@@ -239,11 +201,13 @@ npx @asno-dev/apex gemini
   ]
 }
 ```
+
+Agents (`@arch`, `@ui`, etc.) are auto-discovered from `.gemini/agents/*.md` YAML frontmatter — no `agents` array in the extension JSON to avoid duplicate warnings.
 </details>
 
 **Installs:** `.gemini/gemini-extension.json`, `.gemini/agents/` (10 `.md`), `.gemini/commands/` (8 `.md`)
 
-**Then:** `gemini extensions install .gemini` (installs from `.gemini/gemini-extension.json`)
+**Then:** `gemini extensions install .gemini`
 
 ---
 
@@ -269,7 +233,7 @@ npx @asno-dev/apex cursor
 
 **Installs:** `.cursor/mcp.json`, `.cursor/rules/apex.mdc`, `.cursor/agents/` (10 `.mdc`), `.cursor/commands/` (8 `.md`)
 
-**Auto-detects** — Cursor loads `.cursor/mcp.json` and `.cursor/rules/apex.mdc` on project open. Zero setup.
+**Auto-detects** — Cursor loads `.cursor/mcp.json` and `.cursor/rules/apex.mdc` on project open.
 
 ---
 
@@ -295,7 +259,7 @@ npx @asno-dev/apex cline
 
 **Installs:** `.cline/mcp.json`, `.cline/rules/apex.mdc`, `.cline/agents/` (10 `.mdc`), `.cline/commands/` (8 `.md`), `.clinerules`
 
-**Auto-detects** — Cline loads `.cline/` config on project open. Zero setup.
+**Auto-detects** — Cline loads `.cline/` config on project open.
 
 ---
 
@@ -322,7 +286,7 @@ npx @asno-dev/apex opencode
 
 **Installs:** `opencode.json`, `adapters/opencode/apex.mjs`, `.opencode/agents/` (10)
 
-**Auto-detects** — OpenCode loads `opencode.json` and `.opencode/agents/` on startup. Zero setup.
+**Auto-detects** — OpenCode loads `opencode.json` and `.opencode/agents/` on startup.
 
 ---
 
@@ -345,27 +309,44 @@ npx @asno-dev/apex antigravity
     "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
     "apex-composio": { "command": ["node", "apex/src/composio-server.mjs"], "type": "local" }
   },
-  "subagents": {
-    "arch": { "name": "Max", "role": "Architect" },
-    "ui": { "name": "Zara", "role": "UI/UX Designer" },
-    "debug": { "name": "Kai", "role": "Debugger" },
-    "perf": { "name": "Rex", "role": "Performance Engineer" },
-    "sec": { "name": "Vex", "role": "Security Engineer" },
-    "infra": { "name": "Io", "role": "Infrastructure Engineer" },
-    "nova": { "name": "Nova", "role": "Creative" },
-    "reed": { "name": "Dr.Reed", "role": "Researcher" },
-    "review": { "name": "Rila", "role": "Reviewer" },
-    "flex": { "name": "Flex", "role": "Founder/PM" }
-  },
-  "commands": ["apex", "docs", "excel", "ppt", "composio-setup", "composio-status", "composio-sync", "mirage"],
-  "features": { "modes": ["direct", "team", "select"], "composio": true, "mirage": true, "officecli": true }
+  "subagents": [
+    {"name": "arch", "tag": "@arch", "description": "Max the Architect"},
+    {"name": "ui", "tag": "@ui", "description": "Zara the UI Painter"},
+    {"name": "debug", "tag": "@debug", "description": "Kai the Debugger"},
+    {"name": "perf", "tag": "@perf", "description": "Rex the Performance Engineer"},
+    {"name": "sec", "tag": "@sec", "description": "Vex the Security Engineer"},
+    {"name": "infra", "tag": "@infra", "description": "Io the Infrastructure Engineer"},
+    {"name": "nova", "tag": "@nova", "description": "Nova the Creative"},
+    {"name": "reed", "tag": "@reed", "description": "Dr. Reed the Researcher"},
+    {"name": "review", "tag": "@review", "description": "Rila the Reviewer"},
+    {"name": "flex", "tag": "@flex", "description": "Flex the Founder"}
+  ],
+  "commands": [
+    {"name": "apex", "description": "APEX mode switching"},
+    {"name": "apex-team", "description": "Full team mode"},
+    {"name": "apex-docs", "description": "Word documents"},
+    {"name": "apex-excel", "description": "Excel spreadsheets"},
+    {"name": "apex-ppt", "description": "PowerPoint presentations"},
+    {"name": "apex-composio-setup", "description": "Connect external tools"},
+    {"name": "apex-composio-status", "description": "Show connected tools"},
+    {"name": "apex-composio-sync", "description": "Force sync"},
+    {"name": "apex-mirage", "description": "VFS commands"}
+  ],
+  "features": {
+    "modes": ["direct", "team", "select"],
+    "composio": true,
+    "mirage": true,
+    "officecli": true
+  }
 }
 ```
 </details>
 
-**Installs:** `antigravity-extension.json`, `AGENTS.md`
+**Installs:** `antigravity-extension.json`, `AGENTS.md`, `apex/src/` (MCP server files)
 
-**Auto-detects** — Antigravity scans for `antigravity-extension.json` on startup. Zero setup.
+**Then:** Ensure `agy` binary is in PATH. The extension auto-detects on startup.
+
+**Prerequisite:** [Antigravity CLI](https://github.com/antigravity-ai/agy) installed, `agy` in PATH.
 
 ---
 
@@ -381,7 +362,7 @@ npx @asno-dev/apex devin
 ```json
 {
   "name": "apex",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "mcpServers": {
     "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
     "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
@@ -415,7 +396,7 @@ npx @asno-dev/apex devin
 
 **Installs:** `.devin/plugin.json`, `.devin/agents/` (10 `.md`), `.devin/commands/` (8 `.md`)
 
-**Auto-detects** — Devin reads `.devin/` config on startup. Zero setup.
+**Auto-detects** — Devin reads `.devin/` config on startup.
 
 ---
 
@@ -431,7 +412,7 @@ npx @asno-dev/apex hermes
 ```json
 {
   "name": "apex",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "mcpServers": {
     "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"], "type": "local" },
     "mirage-vfs": { "command": ["node", "apex/src/mirage-server.mjs"], "type": "local" },
@@ -476,12 +457,12 @@ npx @asno-dev/apex pi
 ```
 
 <details>
-<summary><strong>.pi/package.json</strong> — Pi extension with MCP servers</summary>
+<summary><strong>.pi/</strong> — NPM package with MCP servers, agents, and commands</summary>
 
 ```json
 {
   "name": "apex",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "main": "index.js",
   "pi": {
     "mcpServers": {
@@ -499,7 +480,7 @@ npx @asno-dev/apex pi
 
 **Installs:** `.pi/package.json`, `.pi/index.js`, `.pi/agents/` (10 `.md`), `.pi/commands/` (8 `.md`)
 
-**Auto-detects** — Pi loads `.pi/` extensions on project trust. Zero setup.
+**Auto-detects** — Pi loads `.pi/` extensions on project trust.
 
 ---
 
@@ -515,7 +496,7 @@ npx @asno-dev/apex openclaw
 ```json
 {
   "name": "apex",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "skills": ["arch", "ui", "debug", "perf", "sec", "infra", "nova", "reed", "review", "flex"],
   "mcpServers": {
     "apex-hands": { "command": ["node", "apex/src/hands-server.mjs"] },
@@ -526,9 +507,9 @@ npx @asno-dev/apex openclaw
 ```
 </details>
 
-**Installs:** `.openclaw/skills/manifest.json`, `.openclaw/skills/` (10), `.openclaw/commands/` (8 `.md`)
+**Installs:** `.openclaw/skills/manifest.json`, `.openclaw/skills/` (10 `.md`), `.openclaw/commands/` (8 `.md`)
 
-**Auto-detects** — OpenClaw loads `.openclaw/skills/` on project open. Zero setup.
+**Auto-detects** — OpenClaw loads `.openclaw/skills/` on project open.
 
 ---
 
@@ -584,27 +565,27 @@ npx @asno-dev/apex kilocode
 
 **Installs:** `.kilo/mcp.json`, `.kilo/steering/apex.md`, `.kilo/agents/` (10 `.md`), `.kilo/commands/` (8 `.md`)
 
-**Auto-detects** — KiloCode (`kilo` binary) loads `.kilo/` config on project open. Zero setup.
+**Auto-detects** — KiloCode (`kilo` binary) loads `.kilo/` config on project open.
 
 ---
 
-## ⌨️ Commands
+## Commands
 
 | Command | Description |
 |:--------|:------------|
 | `apex-docs` | Create/edit Word documents via OfficeCLI |
 | `apex-excel` | Create/edit Excel spreadsheets via OfficeCLI |
 | `apex-ppt` | Create PowerPoint presentations via OfficeCLI |
-| `node apex/src/composio-setup.mjs` | Connect external tools — paste API key, get OAuth link |
-| `node apex/src/composio-status.mjs` | Show connected tools and API key status |
-| `node apex/src/composio-status.mjs --sync` | Force sync from Composio backend |
+| `apex-composio-setup` | Connect external tools — paste API key, get OAuth link |
+| `apex-composio-status` | Show connected tools and API key status |
+| `apex-composio-sync` | Force sync from Composio backend |
 | `apex-mirage <command>` | Execute commands across mounted virtual filesystem backends |
 | `/apex-team` | Full team mode — all 10 agents work together end-to-end |
 | `/apex team\|select\|off\|status\|help` | APEX mode control |
 
 ---
 
-## 🔧 MCP Servers
+## MCP Servers
 
 APEX provides **3 MCP (Model Context Protocol) servers** with **56 purpose-built tools** across all 10 agents, plus **6 virtual filesystem tools** and **1000+ external tool bridges**.
 
@@ -640,7 +621,7 @@ apex-mirage grep -r error /s3/logs/    — Search across backends
 
 Bridges Gmail, GitHub, Slack, Jira, Notion, and 1000+ more tools.
 
-**Setup:** `node apex/src/composio-setup.mjs`
+**Setup:** `apex-composio-setup`
 
 **Usage:** `@gmail send email` | `@github create PR` | `@slack post message`
 
@@ -658,7 +639,7 @@ Bridges Gmail, GitHub, Slack, Jira, Notion, and 1000+ more tools.
 
 ---
 
-## 🔗 Agent Chains
+## Agent Chains
 
 ### Sequential
 ```
@@ -680,7 +661,7 @@ System design:   @arch ∥ @reed              # Architecture + Research in paral
 
 ---
 
-## 🎨 Design System (Zara)
+## Design System (Zara)
 
 - **10 curated palettes**: Trust, Energy, Authority, Clarity, Warmth, Midnight, Forest, Ocean, Aurora, Minimal
 - **CSS variable tokens** for all colors as `:root` variables
@@ -700,7 +681,7 @@ System design:   @arch ∥ @reed              # Architecture + Research in paral
 
 ---
 
-## 📋 Requirements
+## Requirements
 
 - **Node.js** ≥ 18.0.0
 - At least one supported coding agent installed
@@ -711,7 +692,7 @@ APEX has **zero production dependencies**. It uses only Node.js built-in modules
 
 ---
 
-## 🧪 Development
+## Development
 
 ```bash
 git clone https://github.com/asno-dev/apex.git
@@ -733,7 +714,7 @@ npm test
 
 ---
 
-## 📄 License
+## License
 
 [MIT](LICENSE) © [asno-dev](https://github.com/asno-dev)
 
